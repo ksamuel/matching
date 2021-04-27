@@ -1,6 +1,5 @@
 import React from 'react';
 
-import {useState} from 'react'
 
 import {
 
@@ -8,27 +7,21 @@ import {
 
 } from "react-router-dom";
 
-import {
-
-	MenuIcon,
-
-} from '@heroicons/react/outline'
 
 import Dropzone from "./dropzone"
 import Sidebar from "./Sidebar"
-import SamplingConfiguration from "./samplingConfiguration";
-import SampleTable from "./sampleTable";
-import NoDatasource from "./noDatasource";
-import NoSample from "./nosample";
+import SamplingConfiguration from "./samplingConfiguration"
+import SampleTable from "./sampleTable"
+import NoDatasource from "./noDatasource"
+import NoSample from "./nosample"
 
 export default function Layout() {
 
-	const [sidebarOpen, setSidebarOpen] = useState(false)
 
 	return (
 		<div className="h-screen flex overflow-hidden bg-gray-100">
 
-			<Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}></Sidebar>
+			<Sidebar></Sidebar>
 
 
 			<div className="flex flex-col w-0 flex-1 overflow-hidden">

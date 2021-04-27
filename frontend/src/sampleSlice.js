@@ -1,48 +1,13 @@
 import {createSlice} from '@reduxjs/toolkit'
+import {shortMenu} from "./testData";
+
 
 export const sampleSlice = createSlice({
-	name: 'samples',
+	name: 'shortMenu',
 	initialState: {
 		currentDatasource: null,
 		currentSample: null,
-		datasources: [
-			{
-				id: "1",
-				name: 'appariement_qualite_ij_apprenti_champ_2018_2019_ij_sia_apprenti_01122018_31122018.xml', href: '#',
-				samples: []
-			},
-			{
-				id: "2",
-				name: 'Team',
-				samples: [
-					{id: "1", name: 'Overview', href: '#'},
-					{id: "2", name: 'Members', href: '#'},
-					{id: "3", name: 'Calendar', href: '#'},
-					{id: "4", name: 'Settings', href: '#'},
-				],
-			},
-			{
-				id: "3",
-				name: 'appariement_qualite_ij_foo_champ_2018_2019_ij_sia_bar_01122018_3114318.xml',
-				samples: [
-					{id: "5", name: 'Overview', href: '#'},
-					{id: "6", name: 'Members', href: '#'},
-					{id: "7", name: 'Calendar', href: '#'},
-					{id: "8", name: 'Settings', href: '#'},
-				],
-			},
-			{
-				id: "4",
-				name: 'XML',
-				samples: [
-					{id: "9", name: 'Overview', href: '#'},
-					{id: "10", name: 'Members', href: '#'},
-					{id: "11", name: 'Calendar', href: '#'},
-					{id: "12", name: 'Settings', href: '#'},
-				],
-			},
-
-		],
+		datasources: shortMenu
 	},
 	reducers: {
 
