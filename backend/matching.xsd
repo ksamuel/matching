@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="specificationRecordlinkage" type="specificationRecordlinkageType"/>
+  <xs:complexType name="serverParameterType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:short" name="port" use="required"/>
+        <xs:attribute type="xs:string" name="server" use="required" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="userParameterType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="password" use="required" />
+        <xs:attribute type="xs:string" name="user" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="baseParameterType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="database" use="required"/>
+        <xs:attribute type="xs:string" name="schema" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="databaseParameterType">
+    <xs:sequence>
+      <xs:element type="serverParameterType" name="serverParameter"/>
+      <xs:element type="userParameterType" name="userParameter"/>
+      <xs:element type="baseParameterType" name="baseParameter"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="columnType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="name" use="optional"/>
+        <xs:attribute type="xs:byte" name="optional" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="inputTableType">
+    <xs:sequence>
+      <xs:element type="columnType" name="column" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="primaryKeyName" use="optional"/>
+    <xs:attribute type="xs:string" name="tableName" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="outputTablesType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="exactRecordLinkageTableName"/>
+        <xs:attribute type="xs:string" name="fuzzyRecordLinkageTableName"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="classificationEvaluationTableType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="annotationColumnName"/>
+        <xs:attribute type="xs:string" name="incertain"/>
+        <xs:attribute type="xs:string" name="negative"/>
+        <xs:attribute type="xs:string" name="positive"/>
+        <xs:attribute type="xs:string" name="tableName"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="logParsedSpecificationType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="verbosity"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="filterType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="columnName" use="optional"/>
+        <xs:attribute type="xs:string" name="tableName" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="operatorType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="type" use="optional"/>
+        <xs:attribute type="xs:string" name="columnName" use="optional"/>
+        <xs:attribute type="xs:string" name="tableName" use="optional"/>
+        <xs:attribute type="xs:byte" name="maximumDistance" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="conditionType">
+    <xs:choice maxOccurs="unbounded" minOccurs="0">
+      <xs:element type="filterType" name="filter"/>
+      <xs:element type="operatorType" name="operator"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="exactRecordLinkageType">
+    <xs:sequence>
+      <xs:element type="conditionType" name="condition" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="pairCreationType">
+    <xs:sequence>
+      <xs:element type="conditionType" name="condition" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="indexingType">
+    <xs:sequence>
+      <xs:element type="pairCreationType" name="pairCreation" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="inputType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="name1" use="optional"/>
+        <xs:attribute type="xs:string" name="name2" use="optional"/>
+        <xs:attribute type="xs:string" name="tableName" use="optional"/>
+        <xs:attribute type="xs:string" name="name3" use="optional"/>
+        <xs:attribute type="xs:string" name="day" use="optional"/>
+        <xs:attribute type="xs:string" name="month" use="optional"/>
+        <xs:attribute type="xs:string" name="year" use="optional"/>
+        <xs:attribute type="xs:string" name="columnName" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="similarityType">
+    <xs:sequence>
+      <xs:element type="inputType" name="input" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="similarityMethod" use="optional"/>
+    <xs:attribute type="xs:string" name="similarityName" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="recordPairComparisonType">
+    <xs:sequence>
+      <xs:element type="similarityType" name="similarity" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="similarityUsageType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:float" name="add" use="optional"/>
+        <xs:attribute type="xs:float" name="minimumValue" use="optional"/>
+        <xs:attribute type="xs:short" name="power" use="optional"/>
+        <xs:attribute type="xs:string" name="similarityName" use="optional"/>
+        <xs:attribute type="xs:float" name="wheight" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="classificationType">
+    <xs:sequence>
+      <xs:element type="similarityUsageType" name="similarityUsage" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="methodName"/>
+    <xs:attribute type="xs:float" name="thresholdValue"/>
+  </xs:complexType>
+  <xs:complexType name="fuzzyRecordLinkageType">
+    <xs:sequence>
+      <xs:element type="indexingType" name="indexing"/>
+      <xs:element type="recordPairComparisonType" name="recordPairComparison"/>
+      <xs:element type="classificationType" name="classification"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="specificationRecordlinkageType">
+    <xs:sequence>
+      <xs:element type="databaseParameterType" name="databaseParameter"/>
+      <xs:element type="inputTableType" name="inputTable" maxOccurs="unbounded" minOccurs="0"/>
+      <xs:element type="outputTablesType" name="outputTables"/>
+      <xs:element type="classificationEvaluationTableType" name="classificationEvaluationTable"/>
+      <xs:element type="logParsedSpecificationType" name="logParsedSpecification"/>
+      <xs:element type="exactRecordLinkageType" name="exactRecordLinkage"/>
+      <xs:element type="fuzzyRecordLinkageType" name="fuzzyRecordLinkage"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
