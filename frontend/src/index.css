@@ -17,10 +17,15 @@ code {
 }
 
 @variants hover {
-  .untruncate {
-  overflow: inherit;
-  text-overflow: inherit;
-  white-space: inherit;
-  }
+	.untruncate {
+		overflow: inherit;
+		text-overflow: inherit;
+		white-space: inherit;
+	}
 }
 
+
+/* Firefox */
+input[type=number] {
+	appearance: textfield;
+}

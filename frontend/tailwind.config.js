@@ -14,6 +14,7 @@ module.exports = {
     extend: {
       textOverflow: ['hover', 'focus'],
       wordBreak: ['hover', 'focus'],
+      opacity: ['disabled'],
     },
   },
   plugins: [require('@tailwindcss/forms')],

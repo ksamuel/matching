@@ -2,26 +2,33 @@ import React, {useState} from "react"
 import {useDropzone} from "react-dropzone"
 import axios from "axios"
 
+import {useDispatch} from "react-redux";
+
+
+import {voidDataSource} from "./sampleSlice"
+
 export default function Dropzone() {
-    const [uri, setUri] = useState('');
-    const {getRootProps, getInputProps, open, acceptedFiles, fileRejections} = useDropzone({
-        noClick: true,
-        noKeyboard: true,
-        accept: ['application/xml', 'text/xml'],
-        onDropAccepted: (files) => {
+	const dispatch = useDispatch()
+	dispatch(voidDataSource())
+	const [uri, setUri] = useState('');
+	const {getRootProps, getInputProps, open, acceptedFiles, fileRejections} = useDropzone({
+		noClick: true,
+		noKeyboard: true,
+		accept: ['application/xml', 'text/xml'],
+		onDropAccepted: (files) => {
 
-            var formData = new FormData();
-            formData.append("xml", files[0]);
+			var formData = new FormData();
+			formData.append("xml", files[0]);
 
-            axios.post('/upload_file/', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            }).then((response) => {
-                setUri(response.data)
-            })
+			axios.post('/upload_file/', formData, {
+				headers: {
+					'Content-Type': 'multipart/form-data'
+				}
+			}).then((response) => {
+				setUri(response.data)
+			})
 
-        }
+		}
     });
 
     const files = acceptedFiles.map(file => (

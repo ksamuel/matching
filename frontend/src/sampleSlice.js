@@ -17,7 +17,7 @@ export const sampleSlice = createSlice({
 		setCurrentSample: (state, action) => {
 			state.currentSample = action.payload
 		},
-		voidDataSource: () => {
+		voidDataSource: (state) => {
 			state.currentSample = null
 			state.currentDatasource = null
 		},
@@ -26,6 +26,6 @@ export const sampleSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const {setCurrentDataSource, setCurrentSample, voidDataSourceByAmount} = sampleSlice.actions
+export const {setCurrentDataSource, setCurrentSample, voidDataSource} = sampleSlice.actions
 
 export default sampleSlice.reducer

@@ -9,7 +9,24 @@ import {useDispatch} from "react-redux";
 import findCurrentData from "./selectors"
 
 import {setCurrentDataSource, setCurrentSample} from "./sampleSlice"
-import {classNames} from "./utils";
+
+import {classNames, zip} from "./utils";
+
+function StringComparison({first, second}) {
+
+	if (!second) {
+		return <span>{first}<br/>...</span>
+	}
+
+	if (!first) {
+		return <span>...<br/>{second}</span>
+	}
+
+	zip(Array.from(first), Array.from(second), fill = ' ').map((a, b) => {
+		
+	})
+}
+
 
 function TripleButton({initialValue, onChange}) {
 
