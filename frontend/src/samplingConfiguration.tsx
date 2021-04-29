@@ -5,7 +5,6 @@ import {
 } from "react-router-dom"
 import {useDispatch} from "react-redux"
 
-import NumericInput from "react-numeric-input";
 
 import Slider from 'rc-slider'
 import 'rc-slider/assets/index.css'
@@ -113,8 +112,10 @@ export default function SamplingConfiguration() {
 
                     <div className="text-xl mb-4 flex items-center">
 
-						<span className="flex-initial">
-							<label className="text-xl " htmlFor="count">Cardinalité: </label>
+						<span className="flex-initial w-2/5 ">
+							<span className="text-xl w-64"><label
+                                className="text-xl "
+                                htmlFor="count">Cardinalité: </label></span>
 
 							<span>
 							<input type="number" name="count" value={count} max={1000} min={0}
@@ -136,8 +137,8 @@ export default function SamplingConfiguration() {
 
                     <div className="text-xl mb-4 flex items-center">
 
-						<span className="flex-initial">
-							<label className="text-xl " htmlFor="minscore">Score min</label>
+						<span className="flex-initial w-1/5 ">
+							<label className="text-xl  w-44" htmlFor="minscore">Score min: &nbsp;&nbsp;</label>
 
                             <input type="number" name="minscore" value={minScore} max={maxScore} min={0}
                                    onChange={(e) => updateMinScore(e.target.value)}
@@ -146,8 +147,12 @@ export default function SamplingConfiguration() {
                                        "w-16 mx-8 text-right")}
                             />
 
+                            </span>
 
-							<label className="text-xl " htmlFor="maxscore">Score max</label>
+                        <span className="flex-initial w-1/5 ">
+
+
+							<label className="text-xl " htmlFor="maxscore">Score max:</label>
 
                             <input type="number" name="maxscore" value={maxScore} max={allowedMaxScore} min={0}
                                    onChange={(e) => updateMaxScore(e.target.value)}
