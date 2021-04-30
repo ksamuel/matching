@@ -3,22 +3,22 @@ import {shortMenu} from "./testData";
 
 
 export const sampleSlice = createSlice({
-	name: 'shortMenu',
-	initialState: {
-		currentDatasource: null,
-		currentSample: null,
-		datasources: shortMenu
-	},
-	reducers: {
+  name: 'shortMenu',
+  initialState: {
+    currentDatasource: null,
+    currentSample: null,
+    datasources: shortMenu,
+  },
+  reducers: {
 
-		setCurrentDataSource: (state, action) => {
-			state.currentDatasource = action.payload
-		},
-		setCurrentSample: (state, action) => {
-			state.currentSample = action.payload
-		},
-		voidDataSource: (state) => {
-			state.currentSample = null
+    setCurrentDataSource: (state, action) => {
+      state.currentDatasource = action.payload
+    },
+    setCurrentSample: (state, action) => {
+      state.currentSample = action.payload
+    },
+    voidDataSource: (state) => {
+      state.currentSample = null
 			state.currentDatasource = null
 		},
 	},
