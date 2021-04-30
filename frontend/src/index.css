@@ -17,15 +17,33 @@ code {
 }
 
 @variants hover {
-	.untruncate {
-		overflow: inherit;
-		text-overflow: inherit;
-		white-space: inherit;
-	}
+  .untruncate {
+    overflow: inherit;
+    text-overflow: inherit;
+    white-space: inherit;
+  }
+}
+
+/*Remove arrows from number input fields*/
+
+input[type=number] {
+  appearance: textfield;
 }
 
 
-/* Firefox */
-input[type=number] {
-	appearance: textfield;
+/*Spinner*/
+
+.loader {
+  border-top-color: #3498db;
+  animation: spinner 1.5s linear infinite;
+}
+
+
+@keyframes spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

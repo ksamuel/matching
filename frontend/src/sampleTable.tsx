@@ -11,7 +11,8 @@ import findCurrentData from "./selectors"
 import {setCurrentDataSource, setCurrentSample} from "./sampleSlice"
 
 import {classNames, zip} from "./utils";
-import {sampleData} from "./testData";
+
+import axios from "axios";
 
 
 function StringComparison({first, second}) {
@@ -84,7 +85,18 @@ export default function SampleTable() {
     let {datasourceId, sampleId} = useParams()
     let {currentDatasource, currentSample} = findCurrentData({datasourceId, sampleId})
 
-    let [data, setData] = useState(sampleData)
+    let [data, setData] = useState(null)
+
+    useEffect(() => {
+        (async () => {
+            try {
+                let response = await axios.get(`/api/v1/sample/${sampleId}/`)
+                setData(response.data)
+            } catch (e) {
+                alert('Erreur réseau, veuillez recommancer.')
+            }
+        })()
+    }, [sampleId])
 
 
     const history = useHistory()
@@ -107,54 +119,62 @@ export default function SampleTable() {
         <div className="flex flex-col">
             <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                 <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-                    <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                            <tr>
-                                {(data[0].pairs).map((pair) => {
-                                    return <th
+                    {data ?
+                        <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                            <table className="min-w-full divide-y divide-gray-200">
+                                <thead className="bg-gray-50">
+                                <tr>
+                                    {(data[0].pairs).map((pair) => {
+                                        return <th key={pair.name}
+                                                   scope="col"
+                                                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                        >
+                                            {pair.name}
+                                        </th>
+                                    })}
+
+                                    <th
                                         scope="col"
                                         className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     >
-                                        {pair.name}
+                                        Score
                                     </th>
-                                })}
+                                    <th
+                                        scope="col"
+                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                    >
+                                        Status
+                                    </th>
 
-                                <th
-                                    scope="col"
-                                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
-                                    Score
-                                </th>
-                                <th
-                                    scope="col"
-                                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
-                                    Status
-                                </th>
-
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {data.map((match, matchIdx) => (
-                                <tr key={match.id} className={matchIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-
-                                    {(match.pairs.map((pair) => {
-                                        let [first, second] = pair.values
-                                        return <td
-                                            className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{first}{pair.values.length === 2 ?
-                                            <br/> : ''}{second}</td>
-                                    }))}
-
-                                    <td className="px-6 py-4 whitespace-nowrap font-medium text-sm text-gray-500">{match.score}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <TripleButton value={match.status}/>
-                                    </td>
                                 </tr>
-                            ))}
-                            </tbody>
-                        </table>
-					</div>
+                                </thead>
+                                <tbody>
+                                {data.map((match, matchIdx) => (
+                                    <tr key={match.id} className={matchIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+
+                                        {(match.pairs.map((pair) => {
+                                            let [first, second] = pair.values
+                                            return <td key={pair.name}
+                                                       className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{first}{pair.values.length === 2 ?
+                                                <br/> : ''}{second}</td>
+                                        }))}
+
+                                        <td className="px-6 py-4 whitespace-nowrap font-medium text-sm text-gray-500">{match.score}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <TripleButton value={match.status}/>
+                                        </td>
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </table>
+                        </div> : <div className="flex h-screen justify-center items-center flex-col">
+                            <h1 className="text-center my-20 text-4xl font-extrabold text-gray-600 sm:text-5xl sm:tracking-tight lg:text-6xl">
+                                Chargement de l'échantillon
+                            </h1>
+                            <div
+                                className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-64 w-64"></div>
+
+                        </div>}
 				</div>
 			</div>
 		</div>

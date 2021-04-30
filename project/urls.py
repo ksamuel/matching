@@ -16,9 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from backend.views import upload_file
+from backend.views import upload_file, sample
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/v1/sample/<int:sample_id>/', sample),
     path('upload_file/', upload_file)
 ]

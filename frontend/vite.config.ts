@@ -5,7 +5,7 @@ import reactRefresh from '@vitejs/plugin-react-refresh'
 export default defineConfig({
    server: {
     proxy: {
-      '/upload_file/': 'http://127.0.0.1:8000/'
+        '/upload_file/': 'http://127.0.0.1:8000/', '/api/': 'http://127.0.0.1:8000/'
     }
   },
   plugins: [reactRefresh()],
