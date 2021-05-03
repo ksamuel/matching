@@ -16,7 +16,7 @@ import django12factor
 
 from django.core.management.utils import get_random_secret_key
 
-
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,7 +33,9 @@ if not 'SECRET_KEY' in os.environ:
         SECRET_KEY_FILE.write_text(get_random_secret_key())
         os.environ['SECRET_KEY'] = SECRET_KEY_FILE.read_text()
 
-d12f = django12factor.factorise()
+load_dotenv()
+
+d12f = django12factor.factorise(custom_settings=("INSERJEUNES_DB_PWD",))
 
 SECRET_KEY = d12f['SECRET_KEY']
 
@@ -41,6 +43,8 @@ SECRET_KEY = d12f['SECRET_KEY']
 DEBUG = d12f['DEBUG']
 
 ALLOWED_HOSTS = d12f['ALLOWED_HOSTS'] + ['127.0.0.1', 'localhost']
+
+INSERJEUNES_DB_PWD = d12f['INSERJEUNES_DB_PWD']
 
 # Application definition
 

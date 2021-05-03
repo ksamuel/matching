@@ -1,0 +1,177 @@
+<specificationRecordlinkage>
+	<databaseParameter>
+		<serverParameter port="5432" server="cisad72" />
+		<userParameter password="****" user="inserjeunes_rw" />
+		<baseParameter database="inserjeunes_rec_traitements" schema="work_appariement_qualite_2017_2018" />
+	</databaseParameter>
+	<inputTable primaryKeyName="ID_INE_RNIE" tableName="IJ_APPRENTI_CHAMP_RESTREINT">
+		<column name="NOM_1_R" />
+		<column name="NOM_2_R" />
+		<column name="PRENOM_1_R" />		
+		<column name="PRENOM_2_R" />
+		<column name="PRENOM_3_R" />
+		<column name="SEXE" />
+		<column name="JOUR_NAISSANCE" />
+		<column name="MOIS_NAISSANCE" />
+		<column name="ANNEE_NAISSANCE" />
+		<column name="ID_COG_COMMUNE_NAISSANCE" />
+		<column name="ID_DEPARTEMENT_NAISSANCE" />
+		<column name="LIBELLE_COMMUNE_NAISSANCE" />	
+		<column name="ID_NAF_ETAB_CONTRAT" optional="1" />
+		<column name="ID_COG_COMMUNE_ETAB_CONTRAT" optional="1" />
+		<column name="NB_SALARIES_ETAB_CONTRAT" optional="1" />
+	</inputTable>
+	<inputTable garderEmploiPublic="FALSE" primaryKeyName="ID_SISMMO" tableName="IJ_SISMMO_SALARIE_DECEMBRE">
+		<column name="NOM_1_R" />
+		<column name="NOM_2_R" />
+		<column name="PRENOM_1_R" />		
+		<column name="PRENOM_2_R" />
+		<column name="PRENOM_3_R" />
+		<column name="SEXE" />
+		<column name="JOUR_NAISSANCE" />
+		<column name="MOIS_NAISSANCE" />
+		<column name="ANNEE_NAISSANCE" />
+		<column name="ID_COG_COMMUNE_NAISSANCE_R" />	
+		<column name="ID_DEPARTEMENT_NAISSANCE_R" />
+		<column name="LIBELLE_COMMUNE_NAISSANCE_R" />	
+		<column name="ID_NAF_ETAB_EMPLOYEUR" optional="1" />
+		<column name="ID_COG_ETAB_EMPLOYEUR" optional="1" />
+		<column name="EFFECTIF_ETAB_EMPLOYEUR_1" optional="1" />
+		<column name="EFFECTIF_ETAB_EMPLOYEUR_2" optional="1" />
+	</inputTable>
+	<outputTables exactRecordLinkageTableName="RL_QUALITE_APP_SISMMO_EXACT" fuzzyRecordLinkageTableName="RL_QUALITE_APP_SISMMO_APPROCHE" />
+	<classificationEvaluationTable annotationColumnName="STATUT_ANNOTATION" incertain="?" negative="KO" positive="OK" tableName="" />
+	<logParsedSpecification verbosity="no" />
+	<exactRecordLinkage>
+		<condition>
+			<filter columnName="NOM_1_R" tableName="IJ_APPRENTI_CHAMP_RESTREINT" />
+			<operator type="equals" />
+			<filter columnName="NOM_1_R" tableName="IJ_SISMMO_SALARIE_DECEMBRE" />
+		</condition>
+		<condition>
+			<filter columnName="PRENOM_1_R" tableName="IJ_APPRENTI_CHAMP_RESTREINT" />
+			<operator type="equals" />
+			<filter columnName="PRENOM_1_R" tableName="IJ_SISMMO_SALARIE_DECEMBRE" />
+		</condition>
+		<condition>
+			<filter columnName="SEXE" tableName="IJ_APPRENTI_CHAMP_RESTREINT" />
+			<operator type="equals" />
+			<filter columnName="SEXE" tableName="IJ_SISMMO_SALARIE_DECEMBRE" />
+		</condition>
+		<condition>
+			<filter columnName="ANNEE_NAISSANCE" tableName="IJ_APPRENTI_CHAMP_RESTREINT" />
+			<operator type="equals" />
+			<filter columnName="ANNEE_NAISSANCE" tableName="IJ_SISMMO_SALARIE_DECEMBRE" />
+		</condition>
+		<condition>
+			<filter columnName="MOIS_NAISSANCE" tableName="IJ_APPRENTI_CHAMP_RESTREINT" />
+			<operator type="equals" />
+			<filter columnName="MOIS_NAISSANCE" tableName="IJ_SISMMO_SALARIE_DECEMBRE" />
+		</condition>
+		<condition>
+			<filter columnName="JOUR_NAISSANCE" tableName="IJ_APPRENTI_CHAMP_RESTREINT" />
+			<operator type="equals" />
+			<filter columnName="JOUR_NAISSANCE" tableName="IJ_SISMMO_SALARIE_DECEMBRE" />
+		</condition>
+		<condition>
+			<filter columnName="ID_COG_COMMUNE_NAISSANCE" tableName="IJ_APPRENTI_CHAMP_RESTREINT" />
+			<operator type="equals" />
+			<filter columnName="ID_COG_COMMUNE_NAISSANCE_R" tableName="IJ_SISMMO_SALARIE_DECEMBRE" />
+		</condition>
+	</exactRecordLinkage>
+	<fuzzyRecordLinkage>
+		
+		<indexing>
+			
+			<pairCreation>
+				<condition>
+					<filter columnName="NOM_1_R" tableName="IJ_APPRENTI_CHAMP_RESTREINT" />
+					<operator maximumDistance="3" type="levenshteinDistance" />
+					<filter columnName="NOM_1_R" tableName="IJ_SISMMO_SALARIE_DECEMBRE" />
+				</condition>
+				<condition>
+					<filter columnName="PRENOM_1_R" tableName="IJ_APPRENTI_CHAMP_RESTREINT" />
+					<operator maximumDistance="3" type="levenshteinDistance" />
+					<filter columnName="PRENOM_1_R" tableName="IJ_SISMMO_SALARIE_DECEMBRE" />
+				</condition>
+				<condition>
+					<filter columnName="ANNEE_NAISSANCE" tableName="IJ_APPRENTI_CHAMP_RESTREINT" />
+					<operator type="equals" />
+					<filter columnName="ANNEE_NAISSANCE" tableName="IJ_SISMMO_SALARIE_DECEMBRE" />
+				</condition>	
+				<condition>
+					<filter columnName="ID_DEPARTEMENT_NAISSANCE" tableName="IJ_APPRENTI_CHAMP_RESTREINT" />
+					<operator type="equals" />
+					<filter columnName="ID_DEPARTEMENT_NAISSANCE_R" tableName="IJ_SISMMO_SALARIE_DECEMBRE" />
+				</condition>					
+			</pairCreation>
+			
+			<pairCreation>
+				<condition>
+					<filter columnName="ANNEE_NAISSANCE" tableName="IJ_APPRENTI_CHAMP_RESTREINT" />
+					<operator type="equals" />
+					<filter columnName="ANNEE_NAISSANCE" tableName="IJ_SISMMO_SALARIE_DECEMBRE" />
+				</condition>
+				<condition>
+					<filter columnName="MOIS_NAISSANCE" tableName="IJ_APPRENTI_CHAMP_RESTREINT" />
+					<operator type="equals" />
+					<filter columnName="MOIS_NAISSANCE" tableName="IJ_SISMMO_SALARIE_DECEMBRE" />
+				</condition>
+				<condition>
+					<filter columnName="JOUR_NAISSANCE" tableName="IJ_APPRENTI_CHAMP_RESTREINT" />
+					<operator type="equals" />
+					<filter columnName="JOUR_NAISSANCE" tableName="IJ_SISMMO_SALARIE_DECEMBRE" />
+				</condition>
+				<condition>
+					<filter columnName="ID_DEPARTEMENT_NAISSANCE" tableName="IJ_APPRENTI_CHAMP_RESTREINT" />
+					<operator type="equals" />
+					<filter columnName="ID_DEPARTEMENT_NAISSANCE_R" tableName="IJ_SISMMO_SALARIE_DECEMBRE" />
+				</condition>
+			</pairCreation>
+			
+			<pairCreation>
+				<condition>
+					<filter columnName="NOM_1_R" tableName="IJ_APPRENTI_CHAMP_RESTREINT" />
+					<operator type="equals" />
+					<filter columnName="NOM_1_R" tableName="IJ_SISMMO_SALARIE_DECEMBRE" />
+				</condition>
+				<condition>
+					<filter columnName="PRENOM_1_R" tableName="IJ_APPRENTI_CHAMP_RESTREINT" />
+					<operator type="equals" />
+					<filter columnName="PRENOM_1_R" tableName="IJ_SISMMO_SALARIE_DECEMBRE" />
+				</condition>
+			</pairCreation>
+		</indexing>
+		<recordPairComparison>
+			<similarity similarityMethod="jaroWincklerSimilarityNames" similarityName="similarite_nom">
+				<input name1="NOM_1_R" name2="NOM_2_R" tableName="IJ_APPRENTI_CHAMP_RESTREINT" />
+				<input name1="NOM_1_R" name2="NOM_2_R" tableName="IJ_SISMMO_SALARIE_DECEMBRE" />
+			</similarity>
+			<similarity similarityMethod="jaroWincklerSimilarityNames" similarityName="similarite_prenom">
+				<input name1="PRENOM_1_R" name2="PRENOM_2_R" name3="PRENOM_3_R" tableName="IJ_APPRENTI_CHAMP_RESTREINT" />
+				<input name1="PRENOM_1_R" name2="PRENOM_2_R" name3="PRENOM_3_R" tableName="IJ_SISMMO_SALARIE_DECEMBRE" />
+			</similarity>
+			<similarity similarityMethod="similarityBirthDate" similarityName="similarite_dateNaissance">
+				<input day="JOUR_NAISSANCE" month="MOIS_NAISSANCE" tableName="IJ_APPRENTI_CHAMP_RESTREINT" year="ANNEE_NAISSANCE" />
+				<input day="JOUR_NAISSANCE" month="MOIS_NAISSANCE" tableName="IJ_SISMMO_SALARIE_DECEMBRE" year="ANNEE_NAISSANCE" />
+			</similarity>
+			<similarity similarityMethod="levenshteinSimilarityBirthPlaceCOG" similarityName="similarite_codeCommuneNaissance">
+				<input BirthPlaceCode="ID_COG_COMMUNE_NAISSANCE" BirthPlaceName="LIBELLE_COMMUNE_NAISSANCE" tableName="IJ_APPRENTI_CHAMP_RESTREINT" />
+				<input BirthPlaceCode="ID_COG_COMMUNE_NAISSANCE_R" BirthPlaceName="LIBELLE_COMMUNE_NAISSANCE_R" tableName="IJ_SISMMO_SALARIE_DECEMBRE" />
+			</similarity>
+			<similarity similarityMethod="binary" similarityName="similarite_sexe">
+				<input columnName="SEXE" tableName="IJ_APPRENTI_CHAMP_RESTREINT" />
+				<input columnName="SEXE" tableName="IJ_SISMMO_SALARIE_DECEMBRE" />
+			</similarity>	
+		</recordPairComparison>
+		
+		  
+		<classification methodName="handScore" thresholdValue="1.1">
+			<similarityUsage add="0.2" minimumValue="0.75" power="3" similarityName="similarite_nom" wheight="0.30" />
+			<similarityUsage add="0.2" minimumValue="0.75" power="3" similarityName="similarite_prenom" wheight="0.20" />
+			<similarityUsage minimumValue="0.1" power="1" similarityName="similarite_dateNaissance" wheight="0.25" />
+			<similarityUsage power="1" similarityName="similarite_codeCommuneNaissance" wheight="0.20" />
+			<similarityUsage power="1" similarityName="similarite_sexe" wheight="0.05" />
+		</classification>
+	</fuzzyRecordLinkage>
+</specificationRecordlinkage>
