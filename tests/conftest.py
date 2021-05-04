@@ -15,7 +15,8 @@ class FS(SimpleNamespace):
         FIXTURES_DIR
         / "appariement_qualite_ij_apprenti_champ_restreint_2018_2019_ij_sismmo_salarie_01122018_31122018.xml"
     )
-    XML_ERROR = FIXTURES_DIR / "error.xml"
+    XML_NO_PORT = FIXTURES_DIR / "no_port.xml"
+    XML_WRONG_COL = FIXTURES_DIR / "wrong_col.xml"
 
 
 @pytest.fixture

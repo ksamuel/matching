@@ -1,0 +1,157 @@
+<specificationRecordlinkage>
+	<databaseParameter>
+		<serverParameter port="5432" server="localhost" />
+		<userParameter password="*****" user="matching_db" />
+		<baseParameter database="matching_db" schema="annee_2018_2019" />
+	</databaseParameter>
+	<inputTable primaryKeyName="ID_INE_RNIE" tableName="IJ_APPRENTI_CHAMP">
+		<column name="NOM_1_R" />
+		<column name="NOM_2_R" />
+		<column name="PRENOM_1_R" />		
+		<column name="PRENOM_2_R" />
+		<column name="PRENOM_3_R" />
+		<column name="SEXE" />
+		<column name="JOUR_NAISSANCE" />
+		<column name="MOIS_NAISSANCE" />
+		<column name="ANNEE_NAISSANCE" />
+		<column name="ID_COG_COMMUNE_NAISSANCE" optional="1" />	
+		<column name="LIBELLE_COMMUNE_NAISSANCE" optional="1" />	
+		<column name="ID_UAI_CFA" optional="1" />
+		<column name="ID_NAF_ETAB_CONTRAT" optional="1" />
+		<column name="ID_COG_COMMUNE_ETAB_CONTRAT" optional="1" />
+		<column name="NB_SALARIES_ETAB_CONTRAT" optional="1" />
+	</inputTable>
+	<inputTable primaryKeyName="ID_APPRENTI" tableName="IJ_SIA_APPRENTI_DECEMBRE">
+		<column name="NOM_1_R" />
+		<column name="NOM_2_R" />
+		<column name="PRENOM_1_R" />		
+		<column name="PRENOM_2_R" />
+		<column name="PRENOM_3_R" />
+		<column name="SEXE" />
+		<column name="JOUR_NAISSANCE" />
+		<column name="MOIS_NAISSANCE" />
+		<column name="ANNEE_NAISSANCE" />
+		<column name="ID_COG_COMMUNE_NAISSANCE" optional="1" />	
+		<column name="LIBELLE_COMMUNE_NAISSANCE" optional="1" />	
+		<column name="ID_UAI_CFA" optional="1" />
+		<column name="ID_NAF_ETAB" optional="1" />
+		<column name="ID_COG_COMMUNE_ETAB" optional="1" />
+		<column name="NB_SALARIES_ETAB" optional="1" />
+	</inputTable>
+	<outputTables exactRecordLinkageTableName="RL_QUALITE_APP_SIA_EXACT" fuzzyRecordLinkageTableName="RL_QUALITE_APP_SIA_APPROCHE" />
+	<classificationEvaluationTable annotationColumnName="STATUT_ANNOTATION" incertain="?" negative="KO" positive="OK" tableName="" />
+	<logParsedSpecification verbosity="no" />
+	<exactRecordLinkage>
+		<condition>
+			<filter columnName="NOM_1_R" tableName="IJ_APPRENTI_CHAMP" />
+			<operator type="equals" />
+			<filter columnName="NOM_1_R" tableName="IJ_SIA_APPRENTI_DECEMBRE" />
+		</condition>
+		<condition>
+			<filter columnName="PRENOM_1_R" tableName="IJ_APPRENTI_CHAMP" />
+			<operator type="equals" />
+			<filter columnName="PRENOM_1_R" tableName="IJ_SIA_APPRENTI_DECEMBRE" />
+		</condition>
+		<condition>
+			<filter columnName="SEXE" tableName="IJ_APPRENTI_CHAMP" />
+			<operator type="equals" />
+			<filter columnName="SEXE" tableName="IJ_SIA_APPRENTI_DECEMBRE" />
+		</condition>
+		<condition>
+			<filter columnName="ANNEE_NAISSANCE" tableName="IJ_APPRENTI_CHAMP" />
+			<operator type="equals" />
+			<filter columnName="ANNEE_NAISSANCE" tableName="IJ_SIA_APPRENTI_DECEMBRE" />
+		</condition>
+		<condition>
+			<filter columnName="MOIS_NAISSANCE" tableName="IJ_APPRENTI_CHAMP" />
+			<operator type="equals" />
+			<filter columnName="MOIS_NAISSANCE" tableName="IJ_SIA_APPRENTI_DECEMBRE" />
+		</condition>
+		<condition>
+			<filter columnName="JOUR_NAISSANCE" tableName="IJ_APPRENTI_CHAMP" />
+			<operator type="equals" />
+			<filter columnName="JOUR_NAISSANCE" tableName="IJ_SIA_APPRENTI_DECEMBRE" />
+		</condition>
+	</exactRecordLinkage>
+	<fuzzyRecordLinkage>
+		
+		<indexing>
+			
+			<pairCreation>
+				<condition>
+					<filter columnName="NOM_1_R" tableName="IJ_APPRENTI_CHAMP" />
+					<operator maximumDistance="3" type="levenshteinDistance" />
+					<filter columnName="NOM_1_R" tableName="IJ_SIA_APPRENTI_DECEMBRE" />
+				</condition>
+				<condition>
+					<filter columnName="PRENOM_1_R" tableName="IJ_APPRENTI_CHAMP" />
+					<operator maximumDistance="3" type="levenshteinDistance" />
+					<filter columnName="PRENOM_1_R" tableName="IJ_SIA_APPRENTI_DECEMBRE" />
+				</condition>
+				<condition>
+					<filter columnName="ANNEE_NAISSANCE" tableName="IJ_APPRENTI_CHAMP" />
+					<operator type="equals" />
+					<filter columnName="ANNEE_NAISSANCE" tableName="IJ_SIA_APPRENTI_DECEMBRE" />
+				</condition>		
+			</pairCreation>
+			
+			<pairCreation>
+				<condition>
+					<filter columnName="ANNEE_NAISSANCE" tableName="IJ_APPRENTI_CHAMP" />
+					<operator type="equals" />
+					<filter columnName="ANNEE_NAISSANCE" tableName="IJ_SIA_APPRENTI_DECEMBRE" />
+				</condition>
+				<condition>
+					<filter columnName="MOIS_NAISSANCE" tableName="IJ_APPRENTI_CHAMP" />
+					<operator type="equals" />
+					<filter columnName="MOIS_NAISSANCE" tableName="IJ_SIA_APPRENTI_DECEMBRE" />
+				</condition>
+				<condition>
+					<filter columnName="JOUR_NAISSANCE" tableName="IJ_APPRENTI_CHAMP" />
+					<operator type="equals" />
+					<filter columnName="JOUR_NAISSANCE" tableName="IJ_SIA_APPRENTI_DECEMBRE" />
+				</condition>
+			</pairCreation>
+			
+			<pairCreation>
+				<condition>
+					<filter columnName="NOM_1_R" tableName="IJ_APPRENTI_CHAMP" />
+					<operator type="equals" />
+					<filter columnName="NOM_1_R" tableName="IJ_SIA_APPRENTI_DECEMBRE" />
+				</condition>
+				<condition>
+					<filter columnName="PRENOM_1_R" tableName="IJ_APPRENTI_CHAMP" />
+					<operator type="equals" />
+					<filter columnName="PRENOM_1_R" tableName="IJ_SIA_APPRENTI_DECEMBRE" />
+				</condition>
+			</pairCreation>
+		</indexing>
+		<recordPairComparison>
+			<similarity similarityMethod="jaroWincklerSimilarityNames" similarityName="similarite_nom">
+				<input name1="NOM_1_R" name2="NOM_2_R" tableName="IJ_APPRENTI_CHAM" />
+				<input name1="NOM_1_R" name2="NOM_2_R" tableName="IJ_SIA_APPRENTI_DECEMBRE" />
+			</similarity>
+			<similarity similarityMethod="jaroWincklerSimilarityNames" similarityName="similarite_prenom">
+				<input name1="PRENOM_1_R" name2="PRENOM_2_R" name3="PRENOM_3_R" tableName="IJ_APPRENTI_CHAMP" />
+				<input name1="PRENOM_1_R" name2="PRENOM_2_R" name3="PRENOM_3_R" tableName="IJ_SIA_APPRENTI_DECEMBRE" />
+			</similarity>
+			<similarity similarityMethod="similarityBirthDate" similarityName="similarite_dateNaissance">
+				<input day="JOUR_NAISSANCE" month="MOIS_NAISSANCE" tableName="IJ_APPRENTI_CHAMP" year="ANNEE_NAISSANCE" />
+				<input day="JOUR_NAISSANCE" month="MOIS_NAISSANCE" tableName="IJ_SIA_APPRENTI_DECEMBRE" year="ANNEE_NAISSANCE" />
+			</similarity>
+			<similarity similarityMethod="binary" similarityName="similarite_sexe">
+				<input columnName="SEXE" tableName="IJ_APPRENTI_CHAMP" />
+				<input columnName="SEXE" tableName="IJ_SIA_APPRENTI_DECEMBRE" />
+			</similarity>	
+		</recordPairComparison>
+		
+		
+		 
+		<classification methodName="handScore" thresholdValue="1.23">
+			<similarityUsage add="0.2" minimumValue="0.8" power="3" similarityName="similarite_nom" wheight="0.35" />
+			<similarityUsage add="0.2" minimumValue="0.8" power="3" similarityName="similarite_prenom" wheight="0.30" />
+			<similarityUsage minimumValue="0.1" power="1" similarityName="similarite_dateNaissance" wheight="0.30" />
+			<similarityUsage power="1" similarityName="similarite_sexe" wheight="0.05" />
+		</classification>
+	</fuzzyRecordLinkage>
+</specificationRecordlinkage>

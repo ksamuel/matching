@@ -3,27 +3,27 @@ from django.conf import settings
 import pytest
 from lxml.etree import XMLSyntaxError
 
-from backend.views import MatchingConfigParser
+from backend.xml import MatchingConfigParser
 
 
 
 def test_xml_is_checked_against_xsd(fs):
     MatchingConfigParser(fs.XML_APPRENTI)
     with pytest.raises(XMLSyntaxError):
-        MatchingConfigParser(fs.XML_ERROR)
+        MatchingConfigParser(fs.XML_NO_PORT)
 
 
 def test_get_db_url(fs):
     url = f"postgresql://matching_db:{settings.INSERJEUNES_DB_PWD}@localhost:5432/matching_db?options=-csearch_path%3Dannee_2018_2019"
 
     assert (
-        MatchingConfigParser(fs.XML_APPRENTI).db_uri() == url
+        MatchingConfigParser(fs.XML_APPRENTI).db_data()['uri'] == url
     ), "The DB url extracted from the XML should match"
 
 
 def test_get_output_table(fs):
     assert (
-        MatchingConfigParser(fs.XML_APPRENTI).ouput_table()
+        MatchingConfigParser(fs.XML_APPRENTI).output_table()
         == "rl_qualite_app_sia_approche"
     ), "The table named should be extracted from the XML should match"
 
