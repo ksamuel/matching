@@ -1,13 +1,13 @@
 from contextlib import contextmanager
 
-from sqlalchemy import create_engine, Table, MetaData, select, func, column
+from sqlalchemy import create_engine, Table, MetaData, func, column, update
+from sqlalchemy.future import select
 
-from backend.exceptions import DBColumnDoesNotExist
+from backend.exceptions import DBColumnDoesNotExist, InsuffisantSampleSize
 from backend.xml import MatchingConfigParser
 
 
 class DBApi:
-    score_col = column("score_confiance")
     weight_col = column("poids")
 
     def __init__(self, connection, table, db_data, schema):
@@ -30,28 +30,64 @@ class DBApi:
         existing_columns = self.table.columns.keys()
         for col in self.inline_tables():
             if col not in existing_columns:
-                raise DBColumnDoesNotExist(f"The column {col!r} does not exist", column=col)
+                raise DBColumnDoesNotExist(
+                    f"The column {col!r} does not exist", column=col
+                )
 
     def get_score_boundaries(self):
         return self.connection.execute(
-            select(
-                func.min(self.score_col), func.max(self.score_col)
-            ).select_from(self.table).where(self.weight_col == None)
+            select(func.min(self.table.c.score_confiance), func.max(self.table.c.score_confiance))
+                .select_from(self.table)
+                .where(self.table.c.poids.is_(None))
         ).one()
 
-    def sample(self, min_score, max_score, count):
-        columns = (column(c) for c in self.inline_tables())
+    def sample(self, min_score, max_score, size):
+        columns = [column(c) for c in self.inline_tables()]
+        # sample_ids = list(self.connection.execute(
+        #     select(self.table.c.id).select_from(self.table)
+        #         .with_for_update(nowait=True)
+        #         .where(
+        #         max_score >= self.table.c.score_confiance,
+        #         self.table.c.score_confiance >= min_score,
+        #         self.table.c.poids.is_(None),
+        #     )
+        #         .order_by(func.random())
+        #         .limit(size)
+        # ))
+
+        # actual_size = len(sample_ids)
+        # if actual_size < size:
+        #     raise InsuffisantSampleSize(f"You requested {size} elements, but only {actual_size} are available",
+        #                                 requested_size=size, actual_size=actual_size)
+
+        selection = (select(self.table.c.id).select_from(self.table)
+                     .with_for_update(nowait=True)
+                     .where(
+            max_score >= self.table.c.score_confiance,
+            self.table.c.score_confiance >= min_score,
+            self.table.c.poids.is_(None),
+        )
+                     .order_by(func.random())
+                     .limit(size))
+        results = self.connection.execute(
+            update(self.table)
+                .where(self.table.c.id.in_(selection))
+                .values({self.table.c.poids: 1})
+                .returning(*columns)
+        )
+
+        return results
+
+    def reset_weight(self):
         return self.connection.execute(
-            select(*columns)
-                .select_from(self.table)
-                .where(max_score >= self.score_col, self.score_col >= min_score, self.weight_col == None)
-                .order_by(func.random())
-                .limit(count)
+            update(self.table).values({self.table.c.poids: None})
+
         )
 
     @classmethod
     @contextmanager
     def db_from_xml(cls, xml):
+
         xml = MatchingConfigParser(xml)
         db_data = xml.db_data()
 
