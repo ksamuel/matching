@@ -9,7 +9,11 @@ from rest_framework.decorators import api_view
 
 from rest_framework.response import Response
 
+from django_redis import get_redis_connection
+
 from backend.xml import MatchingConfigParser
+
+redis = get_redis_connection("default")
 
 
 class UploadFileForm(forms.Form):

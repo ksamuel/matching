@@ -17,6 +17,7 @@ class DBApi:
         self.schema = schema
 
     def inline_tables(self):
+        yield "id"
         for similarity_col, data_cols in self.schema.items():
             for cols in data_cols["cols"].values():
                 for col in cols:

@@ -25,18 +25,10 @@ PROJECT_DIR = BASE_DIR / 'project'
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
-if not 'SECRET_KEY' in os.environ:
-    SECRET_KEY_FILE = PROJECT_DIR / 'secret_key'
-    try:
-        os.environ['SECRET_KEY'] = SECRET_KEY_FILE.read_text()
-    except FileNotFoundError:
-        SECRET_KEY_FILE.write_text(get_random_secret_key())
-        os.environ['SECRET_KEY'] = SECRET_KEY_FILE.read_text()
-
 load_dotenv()
 
-d12f = django12factor.factorise(custom_settings=("INSERJEUNES_DB_PWD",))
-
+d12f = django12factor.factorise(custom_settings=("INSERJEUNES_DB_PWD", "REDIS_URL"))
+ 
 SECRET_KEY = d12f['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -90,7 +82,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'project.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
@@ -101,6 +92,12 @@ DATABASES = {
     }
 }
 
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": d12f['REDIS_URL'],
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators

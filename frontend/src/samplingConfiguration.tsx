@@ -128,9 +128,9 @@ export default function SamplingConfiguration() {
 						</span>
                         <span className="flex-initial mr-8 text-gray-400">0</span>
                         <span className="flex-1">
-							<Slider min={0} max={1000} step={50} value={count} onChange={setCount}/>
+							<Slider min={0} max={300} step={50} value={count} onChange={setCount}/>
 						</span>
-                        <span className="flex-initial ml-8 text-gray-400">1000</span>
+                        <span className="flex-initial ml-8 text-gray-400">300</span>
 
 
                     </div>

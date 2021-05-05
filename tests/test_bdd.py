@@ -8,6 +8,7 @@ from backend.exceptions import DBColumnDoesNotExist
 def test_inline_tables(fs):
     with DBApi.db_from_xml(fs.XML_APPRENTI) as api:
         assert list(api.inline_tables()) == [
+            "id",
             "nom_1_r_ij_apprenti_champ",
             "nom_2_r_ij_apprenti_champ",
             "nom_1_r_ij_sia_apprenti_decembre",
