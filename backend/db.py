@@ -36,52 +36,53 @@ class DBApi:
 
     def get_score_boundaries(self):
         return self.connection.execute(
-            select(func.min(self.table.c.score_confiance), func.max(self.table.c.score_confiance))
+            select(
+                func.min(self.table.c.score_confiance),
+                func.max(self.table.c.score_confiance),
+            )
                 .select_from(self.table)
                 .where(self.table.c.poids.is_(None))
         ).one()
 
     def sample(self, min_score, max_score, size):
+
+        weight = self.connection.execute(select(func.count()).select_from(self.table)).scalar() / size
+
         columns = [column(c) for c in self.inline_tables()]
-        # sample_ids = list(self.connection.execute(
-        #     select(self.table.c.id).select_from(self.table)
-        #         .with_for_update(nowait=True)
-        #         .where(
-        #         max_score >= self.table.c.score_confiance,
-        #         self.table.c.score_confiance >= min_score,
-        #         self.table.c.poids.is_(None),
-        #     )
-        #         .order_by(func.random())
-        #         .limit(size)
-        # ))
 
-        # actual_size = len(sample_ids)
-        # if actual_size < size:
-        #     raise InsuffisantSampleSize(f"You requested {size} elements, but only {actual_size} are available",
-        #                                 requested_size=size, actual_size=actual_size)
-
-        selection = (select(self.table.c.id).select_from(self.table)
-                     .with_for_update(nowait=True)
-                     .where(
-            max_score >= self.table.c.score_confiance,
-            self.table.c.score_confiance >= min_score,
-            self.table.c.poids.is_(None),
-        )
-                     .order_by(func.random())
-                     .limit(size))
-        results = self.connection.execute(
-            update(self.table)
-                .where(self.table.c.id.in_(selection))
-                .values({self.table.c.poids: 1})
-                .returning(*columns)
+        selection = (
+            select(self.table.c.id)
+                .select_from(self.table)
+                .where(
+                max_score >= self.table.c.score_confiance,
+                self.table.c.score_confiance >= min_score,
+                self.table.c.poids.is_(None),
+            )
+                .order_by(func.random())
+                .limit(size)
         )
 
+        results = list(
+            self.connection.execute(
+                update(self.table)
+                    .where(self.table.c.id.in_(selection))
+                    .values({self.table.c.poids: weight})
+                    .returning(*columns)
+            )
+        )
+
+        actual_size = len(results)
+        if actual_size < size:
+            raise InsuffisantSampleSize(
+                f"You requested {size} elements, but only {actual_size} are available",
+                requested_size=size,
+                actual_size=actual_size,
+            )
         return results
 
     def reset_weight(self):
         return self.connection.execute(
             update(self.table).values({self.table.c.poids: None})
-
         )
 
     @classmethod

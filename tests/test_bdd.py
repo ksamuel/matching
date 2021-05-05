@@ -44,11 +44,42 @@ def test_check_table(fs):
 
 def test_select_sample(fs):
     with DBApi.db_from_xml(fs.XML_APPRENTI) as api:
-        results = api.sample(
-            *api.get_score_boundaries(),
-            5,
-        )
-        assert len(list(results)) == 5
+
+        try:
+            assert not (
+                api.connection.execute(
+                    select(func.count())
+                        .select_from(api.table)
+                        .where(api.table.c.poids.is_not(None))
+                ).scalar()
+            )
+
+            results = list(api.sample(0.30519999999999997, 2.2719999999999994, 5))
+            assert len(list(results)) == 5
+            assert list(dict(results[0]).keys()) == list(api.inline_tables())
+
+            assert (
+                       api.connection.execute(
+                           select(func.count())
+                               .select_from(api.table)
+                               .where(api.table.c.poids.is_not(None))
+                       ).scalar()
+                   ) == 5
+
+            new_results = list(api.sample(0.30519999999999997, 2.2719999999999994, 5))
+
+            assert results != new_results
+
+            assert (
+                       api.connection.execute(
+                           select(func.count())
+                               .select_from(api.table)
+                               .where(api.table.c.poids.is_not(None))
+                       ).scalar()
+                   ) == 10
+
+        finally:
+            api.reset_weight()
 
 
 def test_get_max_score(fs):
