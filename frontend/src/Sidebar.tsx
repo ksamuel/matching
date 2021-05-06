@@ -15,7 +15,10 @@ export default function Sidebar() {
         getAllDatasources().then((response) => dispatch(setDatasources(response.data)))
     }, [])
 
-    const {currentDatasource, currentSample, datasources} = useSelector(state => state.samples)
+    const {currentDatasource, currentSample, datasources} = useSelector(state => ({
+        ...
+            state.samples
+    }))
 
 
     return (

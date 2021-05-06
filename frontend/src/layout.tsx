@@ -30,12 +30,12 @@ export default function Layout() {
                         <Dropzone/>
                     </Route>
 
-                    <Route exact path="/datasources/:datasourceId/sample/:sampleId/" children={<SampleTable/>}>
-
+                    <Route exact path="/datasources/:datasourceId/samples/:sampleId/">
+                        <SampleTable/>
                     </Route>
 
-                    <Route exact path="/datasources/:datasourceId/" children={<SamplingConfiguration/>}>
-
+                    <Route exact path="/datasources/:datasourceId/">
+                        <SamplingConfiguration/>
                     </Route>
 
                     <Route path="/nodatasource/">

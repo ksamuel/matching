@@ -7,7 +7,7 @@ import findCurrentData from "./selectors"
 
 import {setCurrentDataSource, setCurrentSample} from "./sampleSlice"
 
-import {classNames, zip} from "./utils";
+import {classNames, Spinner, zip} from "./utils";
 
 import axios from "axios";
 
@@ -84,13 +84,20 @@ export default function SampleTable() {
 
     let [data, setData] = useState(null)
 
+    // TODO: datasource and datasource DATA are not the same: data[0] is currenttly the data, but it should be the aprams
+
     useEffect(() => {
         (async () => {
             try {
-                let response = await axios.get(`/api/v1/sample/${sampleId}/`)
+                let response = await axios.get(`/api/v1/samples/${sampleId}/data`)
                 setData(response.data)
+                dispatch(setCurrentDataSource(currentDatasource))
+                dispatch(setCurrentSample(currentSample))
             } catch (e) {
-                alert('Erreur réseau, veuillez recommancer.')
+                alert('Erreur réseau, veuillez recommencer.')
+                if (e.status_code === 404) {
+                    history.push("/nosample/")
+                }
             }
         })()
     }, [sampleId])
@@ -98,18 +105,6 @@ export default function SampleTable() {
 
     const history = useHistory()
     const dispatch = useDispatch()
-
-
-    useEffect(() => {
-            if (!currentSample) {
-                history.push("/nosample/")
-            } else {
-                dispatch(setCurrentDataSource(currentDatasource))
-                dispatch(setCurrentSample(currentSample))
-            }
-
-        }, [currentSample]
-    )
 
 
     return (
@@ -164,7 +159,7 @@ export default function SampleTable() {
                                 ))}
                                 </tbody>
                             </table>
-                        </div> : <Spinner/>}
+                        </div> : <Spinner msg={"Chargement"}/>}
                 </div>
             </div>
         </div>

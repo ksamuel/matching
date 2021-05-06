@@ -10,7 +10,7 @@ import findCurrentData from "./selectors"
 
 import {setCurrentDataSource, setCurrentSample} from "./sampleSlice"
 import {classNames, CONTROL_KEYS, Spinner, toFixedTrunc} from "./utils";
-import {getDatasource, getScoreBoundaries} from "./api";
+import {createSample, getDatasource, getScoreBoundaries} from "./api";
 
 const {Range} = Slider
 
@@ -23,31 +23,46 @@ export default function SamplingConfiguration() {
     let [count, setCount] = useState(300)
     let [minScore, setMinScore] = useState(0)
     let [maxScore, setMaxScore] = useState(10)
+    let [loading, setLoading] = useState('')
+
 
     let {currentDatasource} = findCurrentData({datasourceId, sampleId})
 
     useEffect(() => {
 
+
         if (!currentDatasource) {
+            setLoading("Chargement de la source de donnée")
             getDatasource(datasourceId).then((response) => {
 
                 dispatch(setCurrentDataSource(response.data))
                 dispatch(setCurrentSample(null))
-
+                setLoading('')
 
             }).catch((error) => {
 
                 if (error.response.status === 404) {
                     history.push("/nodatasource/")
                 }
+            }).finally(() => {
+                setLoading('')
             })
 
+
+        } else {
+            dispatch(setCurrentDataSource(currentDatasource))
+            dispatch(setCurrentSample(null))
+            setLoading('')
+        }
+        if (!minScore) {
             getScoreBoundaries(datasourceId).then((response) => {
                 setMinScore(response.data.min)
                 setMaxScore(response.data.max)
             })
         }
-    }, [datasourceId])
+
+
+    }, [datasourceId, maxScore])
 
 
     let allowedMaxScore = 5
@@ -75,7 +90,6 @@ export default function SamplingConfiguration() {
         }
 
         if (cleanScore <= allowedMaxScore && cleanScore >= minScore) {
-            console.log(score, toFixedTrunc(cleanScore, 2))
             setMaxScore(toFixedTrunc(cleanScore, 2))
         }
     }
@@ -109,8 +123,22 @@ export default function SamplingConfiguration() {
     }
 
 
+    const requestSample = () => {
+        setLoading("Echantillonnage en cours")
+        createSample(currentDatasource.id, count, minScore, maxScore).then((response) => {
+                history.push(`/datasources/${currentDatasource.id}/samples/${response.data.sample_id}`)
+            }
+        ).catch((error) => {
+            console.log(error)
+            alert('Une erreur est survenue');
+        }).finally(() => {
+            setLoading('')
+        })
+
+    }
+
     return <>{
-        currentDatasource ? <>
+        currentDatasource && loading === '' ? <>
                 <header className="bg-white shadow">
                     <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                         <h1 className="text-3xl font-bold text-gray-900">Nouvel échantillon</h1>
@@ -118,90 +146,100 @@ export default function SamplingConfiguration() {
                     </div>
                 </header>
                 <main>
-                    <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+                    <form action='' onSubmit={(e) => {
 
-                        <div className="px-4 py-6 sm:px-0">
+                        e.preventDefault();
+                        requestSample()
+                    }}>
+                        <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
 
-                            <div className="text-xl mb-4 flex items-center">
+                            <div className="px-4 py-6 sm:px-0">
 
-						<span className="flex-initial w-1/2 ">
-							<span className="text-xl "><label
-                                className="text-xl "
-                                htmlFor="count">Cardinalité: </label></span>
+                                <div className="text-xl mb-4 flex items-center">
 
-							<span>
-							<input type="number" name="count" value={count} max={1000} min={0}
-                                   onChange={(e) => updateCount(e.target.value)}
-                                   onKeyDown={enforceInteger}
-                                   className={classNames(count !== '' ? '' : "border-red-300 focus:border-red-300 border-4 focus:border-4",
-                                       "w-20 mx-8 text-right")}
-                            />
-								</span>
-						</span>
-                                <span className="flex-initial mr-8 text-gray-400">0</span>
-                                <span className="flex-1">
-							<Slider min={0} max={300} step={50} value={count} onChange={setCount}/>
-						</span>
-                                <span className="flex-initial ml-8 text-gray-400">300</span>
+                    <span className="flex-initial w-1/2 ">
+                    <span className="text-xl "><label
+                        className="text-xl "
+                        htmlFor="count">Cardinalité: </label></span>
 
-
-                            </div>
-
-                            <div className="text-xl mb-4 flex items-center">
-
-						<span className="flex-initial w-1/4 ">
-							<label className="text-xl  w-44" htmlFor="minscore">Score min: &nbsp;&nbsp;</label>
-
-                            <input type="number" name="minscore" value={minScore} max={maxScore} min={0}
-                                   onChange={(e) => updateMinScore(e.target.value)}
-                                   onKeyDown={enforceFloat}
-                                   className={classNames(minScore !== '' ? '' : "border-red-300 focus:border-red-300 border-4 focus:border-4",
-                                       "w-20 mx-8 text-right")}
-                            />
-
-                            </span>
-
-                                <span className="flex-initial w-1/4 ">
+                    <span>
+                    <input type="number" name="count" value={count} max={1000} min={0}
+                           onChange={(e) => updateCount(e.target.value)}
+                           onKeyDown={enforceInteger}
+                           className={classNames(count !== '' ? '' : "border-red-300 focus:border-red-300 border-4 focus:border-4",
+                               "w-20 mx-8 text-right")}
+                    />
+                    </span>
+                    </span>
+                                    <span className="flex-initial mr-8 text-gray-400">0</span>
+                                    <span className="flex-1">
+                    <Slider min={0} max={300} step={50} value={count} onChange={setCount}/>
+                    </span>
+                                    <span className="flex-initial ml-8 text-gray-400">300</span>
 
 
-							<label className="text-xl " htmlFor="maxscore">Score max:</label>
+                                </div>
 
-                            <input type="number" name="maxscore" value={maxScore} max={allowedMaxScore} min={0}
-                                   onChange={(e) => updateMaxScore(e.target.value)}
-                                   onKeyDown={enforceFloat}
-                                   className={classNames(maxScore !== '' ? '' : "border-red-300 focus:border-red-300 border-4 focus:border-4",
-                                       "w-20 mx-8 text-right")}
-                            />
+                                <div className="text-xl mb-4 flex items-center">
 
-						</span>
-                                <span className="flex-initial mr-4 text-gray-400">{minScore}</span>
-                                <span className="flex-1">
-							<Range min={minScore * 100} max={maxScore * 100} allowCross={false} step={10}
-                                   value={[minScore * 100, maxScore * 100]}
-                                   onChange={([min, max]) => [setMinScore(min / 100), setMaxScore(max / 100)]}/>
-						</span>
-                                <span className="flex-initial ml-8 text-gray-400">{maxScore}</span>
+                    <span className="flex-initial w-1/4 ">
+                    <label className="text-xl  w-44" htmlFor="minscore">Score min: &nbsp;&nbsp;</label>
 
-                            </div>
+                    <input type="number" name="minscore" value={minScore} max={maxScore} min={0}
+                           onChange={(e) => updateMinScore(e.target.value)}
+                           onKeyDown={enforceFloat}
+                           className={classNames(minScore !== '' ? '' : "border-red-300 focus:border-red-300 border-4 focus:border-4",
+                               "w-20 mx-8 text-right")}
+                    />
 
-                            <div className="flex justify-center">
+                    </span>
+
+                                    <span className="flex-initial w-1/4 ">
 
 
-                                <button type="button"
-                                        disabled={count === '' || maxScore === '' || minScore === ''}
-                                        className="disabled:opacity-30  m-8 inline-flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-2xl">
-                                    Lancer l'échantillonnage
-                                </button>
+                    <label className="text-xl " htmlFor="maxscore">Score max:</label>
 
+                    <input type="number" name="maxscore" value={maxScore} max={allowedMaxScore} min={0}
+                           onChange={(e) => updateMaxScore(e.target.value)}
+                           onKeyDown={enforceFloat}
+                           className={classNames(maxScore !== '' ? '' : "border-red-300 focus:border-red-300 border-4 focus:border-4",
+                               "w-20 mx-8 text-right")}
+                    />
+
+                    </span>
+                                    <span className="flex-initial mr-4 text-gray-400">{minScore}</span>
+                                    <span className="flex-1">
+                    <Range min={minScore * 100} max={maxScore * 100} allowCross={false} step={10}
+                           value={[minScore * 100, maxScore * 100]}
+                           onChange={([min, max]) => [setMinScore(min / 100), setMaxScore(max / 100)]}/>
+                    </span>
+                                    <span className="flex-initial ml-8 text-gray-400">{maxScore}</span>
+
+                                </div>
+
+                                <div className="flex justify-center">
+
+
+                                    <button type="button" onClick={(e) => {
+
+                                        e.preventDefault();
+                                        requestSample()
+                                    }}
+                                            disabled={count === '' || maxScore === '' || minScore === ''}
+                                            className="disabled:opacity-30  m-8 inline-flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-2xl">
+                                        Lancer l'échantillonnage
+                                    </button>
+
+
+                                </div>
 
                             </div>
 
                         </div>
-
-                    </div>
+                    </form>
                 </main>
             </>
-            : <Spinner msg="Chargement"/>
+            : <Spinner msg={loading}/>
     }</>
 
 

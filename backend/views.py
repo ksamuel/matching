@@ -1,11 +1,13 @@
 import logging
+import uuid
 from difflib import ndiff
 
 from django import forms
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, parser_classes
+from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from sqlalchemy.exc import DisconnectionError, DBAPIError, OperationalError
 
@@ -116,6 +118,24 @@ def datasource(request, datasource_id):
 def score_boundaries(request, datasource_id):
     with DBApi.db_from_cache(datasource_id) as api:
         return Response(api.get_score_boundaries())
+
+
+@api_view(["POST"])
+@parser_classes([JSONParser])
+def create_sample(request, datasource_id):
+    with DBApi.db_from_cache(datasource_id) as api:
+        count = int(request.data["count"])
+        min = int(request.data["min"])
+        max = int(request.data["max"])
+        pairs = api.sample(min, max, count)
+        sample_id = str(uuid.uuid4())
+        redis.save_sample(sample_id, count, min, max, pairs)
+        return Response({"sample_id": sample_id})
+
+
+@api_view()
+def get_sample_data(request, sample_id):
+    return Response(redis.load_sample(sample_id))
 
 
 @api_view()

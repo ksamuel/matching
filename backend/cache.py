@@ -15,6 +15,8 @@ def expiration_timestamp(days=30):
 class RedisClient:
     DATASOURCE_SCHEMA_KEY = "matching:datasources:{uid}:schema"
     DATASOURCE_LIST_KEY = "matching:datasources"
+    SAMPLE_PARAMS_KEY = "matching:samples:{uid}:params"
+    SAMPLE_DATA_KEY = "matching:samples:{uid}:data"
 
     def __init__(self):
         self.connexion = get_redis_connection("default")
@@ -37,8 +39,8 @@ class RedisClient:
             [
                 uid.decode("ascii")
                 for uid in self.connexion.zrangebyscore(
-                    self.DATASOURCE_LIST_KEY, now_timestamp(), float("+inf")
-                )
+                self.DATASOURCE_LIST_KEY, now_timestamp(), float("+inf")
+            )
             ]
         )
 
@@ -46,6 +48,22 @@ class RedisClient:
         return [
             {"id": uid, "samples": [], **self.load_datasource(str(uid))}
             for uid in self.list_datasources()
+        ]
+
+    def save_sample(self, uid, count, min_score, max_score, data):
+        self.set(
+            self.SAMPLE_PARAMS_KEY.format(uid=uid),
+            {"count": count, "min_score": min_score, "max_score": max_score},
+        )
+        data = (dict(row) for row in data)
+        data = {row["id"]: json.dumps(row) for row in data}
+        self.connexion.hmset(self.SAMPLE_DATA_KEY.format(uid=uid), data)
+
+    def load_sample(self, uid):
+
+        return [
+            json.loads(row)
+            for id, row in self.connexion.hgetall(self.SAMPLE_DATA_KEY.format(uid=uid)).items()
         ]
 
 

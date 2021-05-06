@@ -1,4 +1,4 @@
-import React, {Fragment, useState} from "react"
+import React, {Fragment, useEffect, useState} from "react"
 import {useDropzone} from "react-dropzone"
 import axios from "axios"
 
@@ -72,7 +72,11 @@ export default function Dropzone() {
     const history = useHistory()
 
     const [errorMsg, setErrorMsg] = useState('')
-    dispatch(voidDataSource())
+
+    useEffect(() => {
+        dispatch(voidDataSource())
+    }, [])
+
 
     const {getRootProps, getInputProps, open, acceptedFiles, fileRejections} = useDropzone({
         noClick: true,
@@ -88,11 +92,7 @@ export default function Dropzone() {
                     'Content-Type': 'multipart/form-data'
                 }
             }).then((response) => {
-
-
                 getAllDatasources().then((response) => dispatch(setDatasources(response.data)))
-
-
                 history.push(`/datasources/${response.data}`)
             }).catch((error) => {
 
@@ -119,7 +119,13 @@ export default function Dropzone() {
             </ul>
         </li>
     ));
-
+    // {/*<aside>*/}
+    //                  {/*    <h4>Files</h4>*/}
+    //                  {/*    <ul>{files}</ul>*/}
+    //                  {/*    <p>{uri}</p>*/}
+    //                  {/*    <h4>Rejected files</h4>*/}
+    //                  {/*    <ul>{fileRejectionItems}</ul>*/}
+    //                  {/*</aside>*/}
 
     return <main className="flex-1 relative overflow-y-auto focus:outline-none" tabIndex={0}>
         <h1 className="text-center my-20 text-4xl font-extrabold text-gray-600 sm:text-5xl sm:tracking-tight lg:text-6xl">
@@ -148,8 +154,8 @@ export default function Dropzone() {
                                 {/* Heroicon name: solid/upload */}
                                 <svg xmlns="http://www.w3.org/2000/svg" className="ml-3 -mr-1 h-5 w-5" fill="none"
                                      viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                          stroke-width="2"
+                                    <path strokeLinecap="round" strokeLinejoin="round"
+                                          strokeWidth="2"
                                           d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
                                 </svg>
 
@@ -162,15 +168,9 @@ export default function Dropzone() {
 
                     {errorMsg && <Error msg={errorMsg}/>}
 
-                    {/*<aside>*/}
-                    {/*    <h4>Files</h4>*/}
-                    {/*    <ul>{files}</ul>*/}
-                    {/*    <p>{uri}</p>*/}
-                    {/*    <h4>Rejected files</h4>*/}
-                    {/*    <ul>{fileRejectionItems}</ul>*/}
-                    {/*</aside>*/}
+
                 </div>
-                {/* /End replace */}
+
             </div>
         </div>
     </main>
