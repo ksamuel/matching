@@ -1,3 +1,5 @@
+import React from "react";
+
 export function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
@@ -38,3 +40,15 @@ export function toFixedTrunc(x, n) {
     return parseFloat(`${v[0]}.${f}`)
 }
 
+export function Spinner({msg}) {
+
+
+    return <div className="flex h-screen justify-center items-center flex-col">
+        <h1 className="text-center my-20 text-4xl font-extrabold text-gray-600 sm:text-5xl sm:tracking-tight lg:text-6xl">
+            {msg}
+        </h1>
+        <div
+            className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-64 w-64"></div>
+
+    </div>;
+}

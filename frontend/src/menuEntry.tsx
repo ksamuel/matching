@@ -2,11 +2,7 @@ import {Disclosure} from "@headlessui/react";
 import React from "react";
 import {classNames} from "./utils";
 
-import {
-
-
-    Link, useHistory
-} from "react-router-dom";
+import {Link, useHistory} from "react-router-dom";
 import dayjs from "dayjs";
 
 
@@ -16,7 +12,7 @@ export default function MenuEntry({datasource, currentDatasource, currentSample}
     const hasSamples = datasource.samples.length > 0
     const isCurrentDatasource = currentDatasource && datasource.id === currentDatasource.id
 
-    return <div onClick={() => history.push(`/datasource/${datasource.id}/`)}>
+    return <div onClick={() => history.push(`/datasources/${datasource.id}/`)}>
 
         <Disclosure as="div" className="space-y-1">
 
@@ -43,12 +39,12 @@ export default function MenuEntry({datasource, currentDatasource, currentSample}
 				</span>
             </Disclosure.Button>
 
-			{/* ACCORDIONS CHILDREN CONTAINING THE SAMPLE PARAMS */}
-			{isCurrentDatasource && <Disclosure.Panel className="space-y-1" static>
+            {/* ACCORDIONS CHILDREN CONTAINING THE SAMPLE PARAMS */}
+            {isCurrentDatasource && <Disclosure.Panel className="space-y-1" static>
                 {datasource.samples.map((sample) => (
                     <Link key={sample.id}
                           onClick={e => e.stopPropagation()}
-                          to={`/datasource/${datasource.id}/sample/${sample.id}/`}
+                          to={`/datasources/${datasource.id}/sample/${sample.id}/`}
                           className={classNames(currentSample && currentSample.id === sample.id ? "border-l-4 border-blue-800 font-black bg-blue-50" : "", "group w-full flex  pl-3 pr-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:text-gray-900 hover:bg-gray-50")}>
                         <ul>
                             <li>Score: {sample.minScore}-{sample.maxScore}</li>
@@ -60,7 +56,7 @@ export default function MenuEntry({datasource, currentDatasource, currentSample}
                 ))}
                 <span className="flex flex-row-reverse">
                                 <Link className="text-center text-xs italic underline text-gray-500 m-2"
-                                      to={`/datasource/${datasource.id}/`}>Ajouter</Link>
+                                      to={`/datasources/${datasource.id}/`}>Ajouter</Link>
                                 </span>
             </Disclosure.Panel>
 

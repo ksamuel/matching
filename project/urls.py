@@ -14,13 +14,24 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 
-from backend.views import upload_file, sample, datasources
+from backend.views import (
+    upload_file,
+    sample,
+    datasource_list,
+    score_boundaries,
+    datasource,
+)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/v1/sample/<int:sample_id>/", sample),
-    path("api/v1/datasources/", datasources),
+    re_path(
+        "api/v1/datasources/(?P<datasource_id>[0-9a-f]{64})/scoreboundaries/",
+        score_boundaries,
+    ),
+    re_path("api/v1/datasources/(?P<datasource_id>[0-9a-f]{64})/", datasource),
+    path("api/v1/datasources/", datasource_list),
     path("upload_file/", upload_file),
 ]

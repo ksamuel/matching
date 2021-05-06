@@ -5,10 +5,12 @@ import axios from "axios"
 import {useDispatch} from "react-redux";
 import {useHistory} from "react-router-dom";
 
-import {voidDataSource} from "./sampleSlice"
+import {setDatasources, voidDataSource} from "./sampleSlice"
 import {Transition} from '@headlessui/react'
 import {XCircleIcon} from '@heroicons/react/outline'
 import {XIcon} from '@heroicons/react/solid'
+import {getAllDatasources} from "./api";
+
 
 function Error({msg}) {
     const [show, setShow] = useState(true)
@@ -86,8 +88,14 @@ export default function Dropzone() {
                     'Content-Type': 'multipart/form-data'
                 }
             }).then((response) => {
-                history.push(`/datasource/${response.data}`)
+
+
+                getAllDatasources().then((response) => dispatch(setDatasources(response.data)))
+
+
+                history.push(`/datasources/${response.data}`)
             }).catch((error) => {
+
                 setErrorMsg(error.response.data)
             })
 

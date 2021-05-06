@@ -1,20 +1,10 @@
-import React, {useEffect} from 'react'
+import React from 'react'
 import './index.css'
 
 import Layout from "./layout"
 
-import {useDispatch} from "react-redux";
-import {setDatasources} from "./sampleSlice";
-import {getDatasources} from "./api";
-
 
 function App() {
-
-    const dispatch = useDispatch()
-    useEffect(() => {
-        getDatasources().then((response) => dispatch(setDatasources(response.data)))
-    }, [])
-
 
     return (
 

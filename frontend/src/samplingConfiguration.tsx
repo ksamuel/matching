@@ -1,8 +1,5 @@
 import React, {useEffect, useState} from "react"
-import {
-    useHistory,
-    useParams
-} from "react-router-dom"
+import {useHistory, useParams} from "react-router-dom"
 import {useDispatch} from "react-redux"
 
 
@@ -12,17 +9,46 @@ import 'rc-slider/assets/index.css'
 import findCurrentData from "./selectors"
 
 import {setCurrentDataSource, setCurrentSample} from "./sampleSlice"
-import {classNames, CONTROL_KEYS, toFixedTrunc} from "./utils";
+import {classNames, CONTROL_KEYS, Spinner, toFixedTrunc} from "./utils";
+import {getDatasource, getScoreBoundaries} from "./api";
 
 const {Range} = Slider
 
 export default function SamplingConfiguration() {
 
     let {datasourceId, sampleId} = useParams()
+    const history = useHistory()
+    const dispatch = useDispatch()
+
+    let [count, setCount] = useState(300)
+    let [minScore, setMinScore] = useState(0)
+    let [maxScore, setMaxScore] = useState(10)
+
     let {currentDatasource} = findCurrentData({datasourceId, sampleId})
-    let [count, setCount] = useState(500)
-    let [minScore, setMinScore] = useState(2)
-    let [maxScore, setMaxScore] = useState(3.2)
+
+    useEffect(() => {
+
+        if (!currentDatasource) {
+            getDatasource(datasourceId).then((response) => {
+
+                dispatch(setCurrentDataSource(response.data))
+                dispatch(setCurrentSample(null))
+
+
+            }).catch((error) => {
+
+                if (error.response.status === 404) {
+                    history.push("/nodatasource/")
+                }
+            })
+
+            getScoreBoundaries(datasourceId).then((response) => {
+                setMinScore(response.data.min)
+                setMaxScore(response.data.max)
+            })
+        }
+    }, [datasourceId])
+
 
     let allowedMaxScore = 5
 
@@ -61,7 +87,7 @@ export default function SamplingConfiguration() {
             setCount('')
             return
         }
-        if (cleanCount <= 1000) {
+        if (cleanCount <= 300) {
             setCount(cleanCount)
         }
     }
@@ -82,38 +108,24 @@ export default function SamplingConfiguration() {
         e.preventDefault()
     }
 
-    const history = useHistory()
-    const dispatch = useDispatch()
 
+    return <>{
+        currentDatasource ? <>
+                <header className="bg-white shadow">
+                    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                        <h1 className="text-3xl font-bold text-gray-900">Nouvel échantillon</h1>
+                        <p> {currentDatasource.name}</p>
+                    </div>
+                </header>
+                <main>
+                    <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
 
-    useEffect(() => {
-            if (!currentDatasource) {
-                history.push("/nodatasource/")
-            } else {
-                dispatch(setCurrentDataSource(currentDatasource))
-                dispatch(setCurrentSample(null))
-            }
+                        <div className="px-4 py-6 sm:px-0">
 
-        }, [currentDatasource]
-    )
+                            <div className="text-xl mb-4 flex items-center">
 
-
-    return <>
-        <header className="bg-white shadow">
-            <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                <h1 className="text-3xl font-bold text-gray-900">Nouvel échantillon</h1>
-                <p> {currentDatasource.name}</p>
-            </div>
-        </header>
-        <main>
-            <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-                {/* Replace with your content */}
-                <div className="px-4 py-6 sm:px-0">
-
-                    <div className="text-xl mb-4 flex items-center">
-
-						<span className="flex-initial w-2/5 ">
-							<span className="text-xl w-64"><label
+						<span className="flex-initial w-1/2 ">
+							<span className="text-xl "><label
                                 className="text-xl "
                                 htmlFor="count">Cardinalité: </label></span>
 
@@ -122,34 +134,34 @@ export default function SamplingConfiguration() {
                                    onChange={(e) => updateCount(e.target.value)}
                                    onKeyDown={enforceInteger}
                                    className={classNames(count !== '' ? '' : "border-red-300 focus:border-red-300 border-4 focus:border-4",
-                                       "w-16 mx-8 text-right")}
+                                       "w-20 mx-8 text-right")}
                             />
 								</span>
 						</span>
-                        <span className="flex-initial mr-8 text-gray-400">0</span>
-                        <span className="flex-1">
+                                <span className="flex-initial mr-8 text-gray-400">0</span>
+                                <span className="flex-1">
 							<Slider min={0} max={300} step={50} value={count} onChange={setCount}/>
 						</span>
-                        <span className="flex-initial ml-8 text-gray-400">300</span>
+                                <span className="flex-initial ml-8 text-gray-400">300</span>
 
 
-                    </div>
+                            </div>
 
-                    <div className="text-xl mb-4 flex items-center">
+                            <div className="text-xl mb-4 flex items-center">
 
-						<span className="flex-initial w-1/5 ">
+						<span className="flex-initial w-1/4 ">
 							<label className="text-xl  w-44" htmlFor="minscore">Score min: &nbsp;&nbsp;</label>
 
                             <input type="number" name="minscore" value={minScore} max={maxScore} min={0}
                                    onChange={(e) => updateMinScore(e.target.value)}
                                    onKeyDown={enforceFloat}
                                    className={classNames(minScore !== '' ? '' : "border-red-300 focus:border-red-300 border-4 focus:border-4",
-                                       "w-16 mx-8 text-right")}
+                                       "w-20 mx-8 text-right")}
                             />
 
                             </span>
 
-                        <span className="flex-initial w-1/5 ">
+                                <span className="flex-initial w-1/4 ">
 
 
 							<label className="text-xl " htmlFor="maxscore">Score max:</label>
@@ -158,37 +170,39 @@ export default function SamplingConfiguration() {
                                    onChange={(e) => updateMaxScore(e.target.value)}
                                    onKeyDown={enforceFloat}
                                    className={classNames(maxScore !== '' ? '' : "border-red-300 focus:border-red-300 border-4 focus:border-4",
-                                       "w-16 mx-8 text-right")}
+                                       "w-20 mx-8 text-right")}
                             />
 
 						</span>
-                        <span className="flex-initial mr-8 text-gray-400">0</span>
-                        <span className="flex-1">
-							<Range min={0} max={500} allowCross={false} step={10}
+                                <span className="flex-initial mr-4 text-gray-400">{minScore}</span>
+                                <span className="flex-1">
+							<Range min={minScore * 100} max={maxScore * 100} allowCross={false} step={10}
                                    value={[minScore * 100, maxScore * 100]}
                                    onChange={([min, max]) => [setMinScore(min / 100), setMaxScore(max / 100)]}/>
 						</span>
-                        <span className="flex-initial ml-8 text-gray-400">5</span>
+                                <span className="flex-initial ml-8 text-gray-400">{maxScore}</span>
+
+                            </div>
+
+                            <div className="flex justify-center">
+
+
+                                <button type="button"
+                                        disabled={count === '' || maxScore === '' || minScore === ''}
+                                        className="disabled:opacity-30  m-8 inline-flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-2xl">
+                                    Lancer l'échantillonnage
+                                </button>
+
+
+                            </div>
+
+                        </div>
 
                     </div>
-
-                    <div className="flex justify-center">
-
-
-                        <button type="button"
-                                disabled={count === '' || maxScore === '' || minScore === ''}
-                                className="disabled:opacity-30  m-8 inline-flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-2xl">
-                            Lancer l'échantillonnage
-                        </button>
-
-
-                    </div>
-
-                </div>
-
-            </div>
-        </main>
-    </>
+                </main>
+            </>
+            : <Spinner msg="Chargement"/>
+    }</>
 
 
 }

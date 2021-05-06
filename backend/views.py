@@ -50,7 +50,15 @@ def upload_file(request):
 
                 uid = xml.hash()
 
-                redis.save_datasource(uid, form.cleaned_data["xml"].name, api.schema)
+                redis.save_datasource(
+                    uid,
+                    {
+                        "name": form.cleaned_data["xml"].name,
+                        "schema": api.schema,
+                        "db_data": api.db_data,
+                        "table": xml.output_table(),
+                    },
+                )
 
                 return HttpResponse(uid)
         except (DisconnectionError, TimeoutError, OperationalError) as e:
@@ -93,8 +101,21 @@ def upload_file(request):
 
 
 @api_view()
-def datasources(request):
+def datasource_list(request):
     return Response(redis.load_datasources())
+
+
+@api_view()
+def datasource(request, datasource_id):
+    datasource = redis.load_datasource(datasource_id)
+    datasource.pop("db_data")
+    return Response({"id": datasource_id, **datasource})
+
+
+@api_view()
+def score_boundaries(request, datasource_id):
+    with DBApi.db_from_cache(datasource_id) as api:
+        return Response(api.get_score_boundaries())
 
 
 @api_view()

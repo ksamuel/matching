@@ -1,8 +1,10 @@
 from contextlib import contextmanager
+from decimal import Decimal, ROUND_DOWN, ROUND_UP
 
 from sqlalchemy import create_engine, Table, MetaData, func, column, update
 from sqlalchemy.future import select
 
+from backend.cache import redis
 from backend.exceptions import DBColumnDoesNotExist, InsuffisantSampleSize
 from backend.xml import MatchingConfigParser
 
@@ -36,7 +38,7 @@ class DBApi:
                 )
 
     def get_score_boundaries(self):
-        return self.connection.execute(
+        min_score, max_score = self.connection.execute(
             select(
                 func.min(self.table.c.score_confiance),
                 func.max(self.table.c.score_confiance),
@@ -45,9 +47,22 @@ class DBApi:
                 .where(self.table.c.poids.is_(None))
         ).one()
 
-    def sample(self, min_score, max_score, size):
+        return {
+            "min": float(
+                Decimal(min_score).quantize(Decimal("0.00"), rounding=ROUND_DOWN)
+            ),
+            "max": float(
+                Decimal(max_score).quantize(Decimal("0.00"), rounding=ROUND_UP)
+            ),
+        }
 
-        weight = self.connection.execute(select(func.count()).select_from(self.table)).scalar() / size
+    def sample(self, min_score, max_score, size):
+        weight = (
+            self.connection.execute(
+                select(func.count()).select_from(self.table)
+            ).scalar()
+            / size
+        )
 
         columns = [column(c) for c in self.inline_tables()]
 
@@ -89,7 +104,6 @@ class DBApi:
     @classmethod
     @contextmanager
     def db_from_xml(cls, xml):
-
         xml = MatchingConfigParser(xml)
         with cls.db_from_parser(xml) as api:
             yield api
@@ -97,7 +111,6 @@ class DBApi:
     @classmethod
     @contextmanager
     def db_from_parser(cls, xml):
-
         db_data = xml.db_data()
 
         engine = create_engine(db_data["uri"])
@@ -112,3 +125,22 @@ class DBApi:
 
         with engine.connect() as connection:
             yield cls(connection, table, db_data, xml.pairs())
+
+    @classmethod
+    @contextmanager
+    def db_from_cache(cls, uid):
+        datasource = redis.load_datasource(uid)
+        db_data = datasource["db_data"]
+
+        engine = create_engine(db_data["uri"])
+
+        table = Table(
+            datasource["table"],
+            MetaData(bind=None),
+            autoload=True,
+            autoload_with=engine,
+            schema=db_data["schema"],
+        )
+
+        with engine.connect() as connection:
+            yield cls(connection, table, db_data, datasource["schema"])

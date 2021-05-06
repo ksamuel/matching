@@ -4,8 +4,8 @@ import {createSlice} from '@reduxjs/toolkit'
 export const sampleSlice = createSlice({
   name: 'shortMenu',
   initialState: {
-    currentDatasource: null,
-    currentSample: null,
+    currentDatasource: {},
+    currentSample: {},
     datasources: [],
   },
   reducers: {
@@ -18,6 +18,13 @@ export const sampleSlice = createSlice({
     setCurrentDataSource: (state, action) => {
       state.currentDatasource = action.payload
     },
+
+    setCurrentDataSourceFromId: (state, action) => {
+      state.currentDatasource = state.datasources.filter((ds) => {
+        return action.payload == ds.id
+      })[0] || {}
+    },
+
     setCurrentSample: (state, action) => {
       state.currentSample = action.payload
     },
@@ -30,6 +37,12 @@ export const sampleSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const {setCurrentDataSource, setCurrentSample, voidDataSource, setDatasources} = sampleSlice.actions
+export const {
+  setCurrentDataSource,
+  setCurrentSample,
+  voidDataSource,
+  setDatasources,
+  setCurrentDataSourceFromId
+} = sampleSlice.actions
 
 export default sampleSlice.reducer

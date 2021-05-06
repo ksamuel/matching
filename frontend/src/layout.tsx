@@ -1,11 +1,7 @@
 import React from 'react';
 
 
-import {
-
-	Route, Switch
-
-} from "react-router-dom";
+import {Route, Switch} from "react-router-dom";
 
 
 import Dropzone from "./dropzone"
@@ -18,42 +14,42 @@ import NoSample from "./nosample"
 export default function Layout() {
 
 
-	return (
-		<div className="h-screen flex overflow-hidden bg-gray-100">
+    return (
+        <div className="h-screen flex overflow-hidden bg-gray-100">
 
-			<Sidebar></Sidebar>
-
-
-			<div className="flex flex-col w-0 flex-1 overflow-hidden">
+            <Sidebar></Sidebar>
 
 
-				<Switch>
+            <div className="flex flex-col w-0 flex-1 overflow-hidden">
 
 
-					<Route exact path="/">
-						<Dropzone/>
-					</Route>
-
-					<Route exact path="/datasource/:datasourceId/sample/:sampleId/" children={<SampleTable/>}>
-
-					</Route>
-
-					<Route exact path="/datasource/:datasourceId/" children={<SamplingConfiguration/>}>
-
-					</Route>
-
-					<Route path="/nodatasource/">
-						<NoDatasource/>
-					</Route>
-
-					<Route path="/nosample/">
-						<NoSample/>
-					</Route>
+                <Switch>
 
 
-				</Switch>
+                    <Route exact path="/">
+                        <Dropzone/>
+                    </Route>
 
-			</div>
-		</div>
-	)
+                    <Route exact path="/datasources/:datasourceId/sample/:sampleId/" children={<SampleTable/>}>
+
+                    </Route>
+
+                    <Route exact path="/datasources/:datasourceId/" children={<SamplingConfiguration/>}>
+
+                    </Route>
+
+                    <Route path="/nodatasource/">
+                        <NoDatasource/>
+                    </Route>
+
+                    <Route path="/nosample/">
+                        <NoSample/>
+                    </Route>
+
+
+                </Switch>
+
+            </div>
+        </div>
+    )
 }

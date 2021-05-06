@@ -25,10 +25,8 @@ class RedisClient:
     def get(self, key):
         return json.loads(self.connexion.get(key))
 
-    def save_datasource(self, uid, name, schema):
-        self.set(
-            self.DATASOURCE_SCHEMA_KEY.format(uid=uid), {"name": name, "schema": schema}
-        )
+    def save_datasource(self, uid, datasource):
+        self.set(self.DATASOURCE_SCHEMA_KEY.format(uid=uid), datasource)
         self.connexion.zadd(self.DATASOURCE_LIST_KEY, {uid: expiration_timestamp()})
 
     def load_datasource(self, uid):
@@ -39,8 +37,8 @@ class RedisClient:
             [
                 uid.decode("ascii")
                 for uid in self.connexion.zrangebyscore(
-                self.DATASOURCE_LIST_KEY, now_timestamp(), float("+inf")
-            )
+                    self.DATASOURCE_LIST_KEY, now_timestamp(), float("+inf")
+                )
             ]
         )
 

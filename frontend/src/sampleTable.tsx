@@ -1,8 +1,5 @@
 import React, {useEffect, useState} from "react"
-import {
-	useHistory,
-    useParams
-} from "react-router-dom"
+import {useHistory, useParams} from "react-router-dom"
 import {useDispatch} from "react-redux";
 
 
@@ -76,7 +73,7 @@ function TripleButton({value, onChange}) {
 		?
 	</button>
 </span>
-	)
+    )
 
 }
 
@@ -167,16 +164,9 @@ export default function SampleTable() {
                                 ))}
                                 </tbody>
                             </table>
-                        </div> : <div className="flex h-screen justify-center items-center flex-col">
-                            <h1 className="text-center my-20 text-4xl font-extrabold text-gray-600 sm:text-5xl sm:tracking-tight lg:text-6xl">
-                                Chargement de l'échantillon
-                            </h1>
-                            <div
-                                className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-64 w-64"></div>
-
-                        </div>}
-				</div>
-			</div>
-		</div>
-	)
+                        </div> : <Spinner/>}
+                </div>
+            </div>
+        </div>
+    )
 }
