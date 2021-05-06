@@ -17,8 +17,21 @@ class FS(SimpleNamespace):
     )
     XML_NO_PORT = FIXTURES_DIR / "no_port.xml"
     XML_WRONG_COL = FIXTURES_DIR / "wrong_col.xml"
+    XML_WRONG_NETLOC = FIXTURES_DIR / "wrong_netloc.xml"
 
 
 @pytest.fixture
 def fs():
     yield FS()
+
+
+@pytest.fixture
+def xml_apprenti(fs):
+    with fs.XML_APPRENTI.open() as f:
+        yield f
+
+
+@pytest.fixture
+def xml_salarie(fs):
+    with fs.XML_SALARIE.open() as f:
+        yield f

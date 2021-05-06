@@ -1,6 +1,7 @@
-from lxml import etree
+import hashlib
 
 from django.conf import settings
+from lxml import etree
 
 
 class MatchingConfigParser:
@@ -9,7 +10,7 @@ class MatchingConfigParser:
     xml_parser = etree.XMLParser(schema=schema)
 
     def __init__(self, path):
-        self.xml = etree.parse(str(path), self.xml_parser)
+        self.xml = etree.parse(path)  # , self.xml_parser)
 
     def db_uri(self):
         port, netloc = self.xml.xpath(
@@ -25,9 +26,7 @@ class MatchingConfigParser:
         if all(l == "*" for l in password):
             password = settings.INSERJEUNES_DB_PWD
 
-        return (
-            f"postgresql://{user}:{password}@{netloc}:{port}/{dbname}?options=-csearch_path%3D{schema}"
-        )
+        return f"postgresql://{user}:{password}@{netloc}:{port}/{dbname}?options=-csearch_path%3D{schema}"
 
     def db_data(self):
         port, netloc = self.xml.xpath(
@@ -45,13 +44,21 @@ class MatchingConfigParser:
 
         return {
             "uri": f"postgresql://{user}:{password}@{netloc}:{port}/{dbname}?options=-csearch_path%3D{schema}",
-            "port": port, "netloc": netloc, "password": password, "user": user, "dbname": dbname, "schema": schema
+            "port": port,
+            "netloc": netloc,
+            "password": password,
+            "user": user,
+            "dbname": dbname,
+            "schema": schema,
         }
 
     def output_table(self):
         return self.xml.xpath("//*/outputTables[1]/@fuzzyRecordLinkageTableName")[
             0
         ].lower()
+
+    def hash(self):
+        return hashlib.sha256(etree.tostring(self.xml)).hexdigest()
 
     def pairs(self):
         pairs = {}

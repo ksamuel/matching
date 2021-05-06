@@ -1,35 +1,48 @@
-from django.conf import settings
-
 import pytest
+from django.conf import settings
 from lxml.etree import XMLSyntaxError
 
 from backend.xml import MatchingConfigParser
 
 
-
-def test_xml_is_checked_against_xsd(fs):
-    MatchingConfigParser(fs.XML_APPRENTI)
+def test_xml_is_checked_against_xsd(fs, xml_apprenti):
+    MatchingConfigParser(xml_apprenti)
     with pytest.raises(XMLSyntaxError):
-        MatchingConfigParser(fs.XML_NO_PORT)
+        MatchingConfigParser(fs.XML_NO_PORT.open())
 
 
-def test_get_db_url(fs):
+def test_get_db_url(xml_apprenti):
     url = f"postgresql://matching_db:{settings.INSERJEUNES_DB_PWD}@localhost:5432/matching_db?options=-csearch_path%3Dannee_2018_2019"
 
     assert (
-        MatchingConfigParser(fs.XML_APPRENTI).db_data()['uri'] == url
+        MatchingConfigParser(xml_apprenti).db_data()["uri"] == url
     ), "The DB url extracted from the XML should match"
 
 
-def test_get_output_table(fs):
+def test_get_output_table(xml_apprenti):
     assert (
-        MatchingConfigParser(fs.XML_APPRENTI).output_table()
+        MatchingConfigParser(xml_apprenti).output_table()
         == "rl_qualite_app_sia_approche"
     ), "The table named should be extracted from the XML should match"
 
 
-def test_get_pairs(fs):
-    assert MatchingConfigParser(fs.XML_APPRENTI).pairs() == {
+def test_hash(fs):
+    assert (
+        MatchingConfigParser(fs.XML_APPRENTI.open()).hash()
+        == MatchingConfigParser(fs.XML_APPRENTI.open()).hash()
+    )
+    assert (
+        MatchingConfigParser(fs.XML_SALARIE.open()).hash()
+        == MatchingConfigParser(fs.XML_SALARIE.open()).hash()
+    )
+    assert (
+        MatchingConfigParser(fs.XML_SALARIE.open()).hash()
+        != MatchingConfigParser(fs.XML_APPRENTI.open()).hash()
+    )
+
+
+def test_get_pairs(xml_apprenti):
+    assert MatchingConfigParser(xml_apprenti).pairs() == {
         "similarite_nom": {
             "cols": {
                 "ij_apprenti_champ": [
@@ -81,4 +94,3 @@ def test_get_pairs(fs):
             "type": "verbatim",
         },
     }
-

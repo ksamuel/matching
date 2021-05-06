@@ -5,8 +5,8 @@ from backend.db import DBApi
 from backend.exceptions import DBColumnDoesNotExist
 
 
-def test_inline_tables(fs):
-    with DBApi.db_from_xml(fs.XML_APPRENTI) as api:
+def test_inline_tables(xml_apprenti):
+    with DBApi.db_from_xml(xml_apprenti) as api:
         assert list(api.inline_tables()) == [
             "id",
             "nom_1_r_ij_apprenti_champ",
@@ -38,20 +38,20 @@ def test_inline_tables(fs):
 
 
 def test_check_table(fs):
-    with DBApi.db_from_xml(fs.XML_WRONG_COL) as api:
+    with DBApi.db_from_xml(fs.XML_WRONG_COL.open()) as api:
         with pytest.raises(DBColumnDoesNotExist):
             api.check_tables()
 
 
-def test_select_sample(fs):
-    with DBApi.db_from_xml(fs.XML_APPRENTI) as api:
+def test_select_sample(xml_apprenti):
+    with DBApi.db_from_xml(xml_apprenti) as api:
 
         try:
             assert not (
                 api.connection.execute(
                     select(func.count())
-                        .select_from(api.table)
-                        .where(api.table.c.poids.is_not(None))
+                    .select_from(api.table)
+                    .where(api.table.c.poids.is_not(None))
                 ).scalar()
             )
 
@@ -60,29 +60,29 @@ def test_select_sample(fs):
             assert list(dict(results[0]).keys()) == list(api.inline_tables())
 
             assert (
-                       api.connection.execute(
-                           select(func.count())
-                               .select_from(api.table)
-                               .where(api.table.c.poids.is_not(None))
-                       ).scalar()
-                   ) == 5
+                api.connection.execute(
+                    select(func.count())
+                    .select_from(api.table)
+                    .where(api.table.c.poids.is_not(None))
+                ).scalar()
+            ) == 5
 
             new_results = list(api.sample(0.30519999999999997, 2.2719999999999994, 5))
 
             assert results != new_results
 
             assert (
-                       api.connection.execute(
-                           select(func.count())
-                               .select_from(api.table)
-                               .where(api.table.c.poids.is_not(None))
-                       ).scalar()
-                   ) == 10
+                api.connection.execute(
+                    select(func.count())
+                    .select_from(api.table)
+                    .where(api.table.c.poids.is_not(None))
+                ).scalar()
+            ) == 10
 
         finally:
             api.reset_weight()
 
 
-def test_get_max_score(fs):
-    with DBApi.db_from_xml(fs.XML_APPRENTI) as api:
+def test_get_max_score(xml_apprenti):
+    with DBApi.db_from_xml(xml_apprenti) as api:
         assert (0.30519999999999997, 2.2719999999999994) == api.get_score_boundaries()

@@ -1,19 +1,20 @@
+import logging
 from difflib import ndiff
 
-from django.http import HttpResponse
-
 from django import forms
+from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-
+from django.views.decorators.http import require_http_methods
 from rest_framework.decorators import api_view
-
 from rest_framework.response import Response
+from sqlalchemy.exc import DisconnectionError, DBAPIError, OperationalError
 
-from django_redis import get_redis_connection
-
+from backend.cache import redis
+from backend.db import DBApi
+from backend.exceptions import DBColumnDoesNotExist
 from backend.xml import MatchingConfigParser
 
-redis = get_redis_connection("default")
+log = logging.getLogger(__name__)
 
 
 class UploadFileForm(forms.Form):
@@ -35,15 +36,65 @@ def common_chars_pair(first, second):
 
 
 @csrf_exempt
+@require_http_methods(["POST"])
 def upload_file(request):
     form = UploadFileForm(request.POST, request.FILES)
     if form.is_valid():
-        # Check file size limit
 
-        parser = MatchingConfigParser(request.FILES["xml"])
-        return HttpResponse(parser.db_uri())
+        xml = MatchingConfigParser(request.FILES["xml"])
 
-    return HttpResponse("Error", 500)
+        try:
+            with DBApi.db_from_parser(xml) as api:
+
+                api.check_tables()
+
+                uid = xml.hash()
+
+                redis.save_datasource(uid, form.cleaned_data["xml"].name, api.schema)
+
+                return HttpResponse(uid)
+        except (DisconnectionError, TimeoutError, OperationalError) as e:
+            log.exception("Connection error in XML upload page.")
+            return HttpResponse(
+                f"Il y a un problème de connection avec le serveur '{xml.db_data()['netloc']}'. Veuillez réessayer. Si "
+                "le problème persiste, vérifiez que les données de connexion du XML sont valides. Si cela ne résout "
+                "pas le problème, contactez votre service informatique.",
+                status=500,
+            )
+
+        except DBAPIError:
+
+            log.exception("Data base error in XML upload page.")
+            return HttpResponse(
+                f"Une erreur est survenue en tentant d'accéder aux données d'échantillongage."
+                "Le problème vient sans doute du logiciel, pas de votre part. Contactez votre service informatique.",
+                status=500,
+            )
+
+        except DBColumnDoesNotExist as e:
+            log.exception("XML contains bad column in XML upload page.")
+            return HttpResponse(
+                f"Le XML contient la colonne '{e.column}' qui n'existe pas sur le serveur {xml.db_data()['netloc']}",
+                status=400,
+            )
+
+        except Exception:
+
+            log.exception("Unknown error in XML upload page.")
+
+            return HttpResponse(
+                f"Une erreur inconnue est survenue en tentant d'accéder aux données d'échantillongage."
+                "Le problème vient sans doute du logiciel, pas de votre part. Contactez votre service informatique.",
+                status=500,
+            )
+
+    (field, [msg, *_]), *_ = form.errors.items()
+    return HttpResponse(f"{field}: {msg}", status=400)
+
+
+@api_view()
+def datasources(request):
+    return Response(redis.load_datasources())
 
 
 @api_view()

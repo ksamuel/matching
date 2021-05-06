@@ -91,6 +91,13 @@ class DBApi:
     def db_from_xml(cls, xml):
 
         xml = MatchingConfigParser(xml)
+        with cls.db_from_parser(xml) as api:
+            yield api
+
+    @classmethod
+    @contextmanager
+    def db_from_parser(cls, xml):
+
         db_data = xml.db_data()
 
         engine = create_engine(db_data["uri"])

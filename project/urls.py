@@ -16,10 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from backend.views import upload_file, sample
+from backend.views import upload_file, sample, datasources
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/v1/sample/<int:sample_id>/', sample),
-    path('upload_file/', upload_file)
+    path("admin/", admin.site.urls),
+    path("api/v1/sample/<int:sample_id>/", sample),
+    path("api/v1/datasources/", datasources),
+    path("upload_file/", upload_file),
 ]
