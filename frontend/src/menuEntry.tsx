@@ -45,11 +45,15 @@ export default function MenuEntry({datasource, currentDatasource, currentSample}
                     <Link key={sample.id}
                           onClick={e => e.stopPropagation()}
                           to={`/datasources/${datasource.id}/samples/${sample.id}/`}
-                          className={classNames(currentSample && currentSample.id === sample.id ? "border-l-4 border-blue-800 font-black bg-blue-50" : "", "group w-full flex  pl-3 pr-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:text-gray-900 hover:bg-gray-50")}>
+                          className={classNames(currentSample && currentSample.id === sample.id ? "border-l-4 border-blue-800  bg-blue-50" : "", "group w-full flex  pl-3 pr-2 py-2 text-sm font-medium text-gray-600 rounded-md  hover:bg-gray-50")}>
                         <ul>
-                            <li>Score: {sample.minScore}-{sample.maxScore}</li>
-                            <li>Paires: {sample.count}</li>
-                            <li>Date: {dayjs(sample.date).format('HH:mm:ss DD/MM/YYYY')}</li>
+                            <li><span
+                                className={"font-black text-gray-800"}>Score:</span> {sample.minScore} - {sample.maxScore}
+                            </li>
+                            <li><span className={"font-black text-gray-800"}>Paires:</span> {sample.count}</li>
+                            <li><span
+                                className={"font-black text-gray-800"}>Date:</span> {dayjs(sample.date).format('HH:mm:ss DD/MM/YYYY')}
+                            </li>
                             <li className="text-xs text-gray-400">Expire: {dayjs(sample.expireDate).fromNow()} < /li>
                         </ul>
                     </Link>

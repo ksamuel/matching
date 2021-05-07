@@ -86,7 +86,7 @@ class RedisClient:
             px=expiration,
         )
 
-        data = (dict(row) for row in data)
+        data = ({**dict(row), "status": None} for row in data)
         data = {row["id"]: json.dumps(row) for row in data}
 
         key = self.SAMPLE_DATA_KEY.format(uid=uid)

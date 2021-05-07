@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react"
+import React, {useEffect, useState, Fragment} from "react"
 import {useHistory, useParams} from "react-router-dom"
 import {useDispatch} from "react-redux";
 
@@ -90,7 +90,7 @@ export default function SampleTable() {
 
 
     const [loading, setLoading] = useState('')
-    const [data, setData] = useState(null)
+    const [data, setData] = useState([])
     const [errorMsg, setErrorMsg] = useState('')
 
     // TODO: datasource and datasource DATA are not the same: data[0] is currenttly the data, but it should be the aprams
@@ -150,11 +150,12 @@ export default function SampleTable() {
 
     useEffect(() => {
 
-        if (!data) {
+        if (!data.length) {
             (async () => {
                 try {
                     setLoading("Chargement de l'échantillon")
                     const dataResponse = await axios.get(`/api/v1/samples/${sampleId}/data`)
+                    console.log(dataResponse.data)
                     setData(dataResponse.data)
 
                 } catch (e) {
@@ -178,72 +179,104 @@ export default function SampleTable() {
         }
     }, [sampleId, data])
 
+    console.log(data)
 
-    return (<>
-            <header className="bg-white shadow">
-                <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                    <h1 className="text-3xl  text-gray-900"><span
-                        className={"font-bold  "}>Paires:</span> {currentSample.count}
-                        <span
-                            className={"font-bold ml-8"}>Score:</span> {currentSample.minScore} {currentSample.maxScore}
-                        <span
-                            className={"font-bold ml-8"}>Date:</span> {dayjs(currentSample.date).format('HH:mm:ss DD/MM/YYYY')}
-                    </h1>
-                    <p> Expire {dayjs(currentSample.expireDate).fromNow()}</p>
-                </div>
-            </header>
+    return (<> {currentDatasource &&
+        <header className="bg-white shadow">
+            <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                <h1 className="text-2xl  text-gray-900 truncate mb-2">{currentDatasource.name}
+                </h1>
+                <p><span
+                    className={"font-bold  "}>Paires:</span> {currentSample.count}
+                    <span
+                        className={"font-bold ml-8"}>Score:</span> {currentSample.minScore} - {currentSample.maxScore}
+                    <span
+                        className={"font-bold ml-8"}>Date:</span> {dayjs(currentSample.date).format('HH:mm:ss DD/MM/YYYY')}
+                    <span
+                        className={"text-sm ml-8 text-gray-400"}>Expire: {dayjs(currentSample.expireDate).fromNow()}</span>
+                </p>
+            </div>
+
+        </header>}
             <main>
                 <div className="flex flex-col">
 
                     <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                         <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-                            {false && currentSample && data && data.length > 0 && loading === "" ?
+                            {currentDatasource && loading === "" ?
                                 <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
                                     <table className="min-w-full divide-y divide-gray-200">
                                         <thead className="bg-gray-50">
                                         <tr>
-                                            {(["foo", "bar", "baz"]).map((pair) => {
-                                                return <th key={pair}
+                                            {Object.keys(currentDatasource['schema']).map((field) => {
+                                                return <th key={field}
                                                            scope="col"
+                                                           colSpan={2}
                                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                                 >
-                                                    {pair.name}
+                                                    {field}
                                                 </th>
                                             })}
 
                                             <th
                                                 scope="col"
+                                                rowSpan={2}
                                                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                             >
                                                 Score
                                             </th>
                                             <th
                                                 scope="col"
+                                                rowSpan={2}
                                                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                             >
                                                 Status
                                             </th>
 
                                         </tr>
-                                </thead>
-                                <tbody>
-                                {data.map((match, matchIdx) => (
-                                    <tr key={match.id} className={matchIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                                        <tr>
 
-                                        {(match.pairs.map((pair) => {
-                                            let [first, second] = pair.values
-                                            return <td key={pair.name}
-                                                       className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{first}{pair.values.length === 2 ?
-                                                <br/> : ''}{second}</td>
-                                        }))}
+                                            {Object.keys(currentDatasource['schema']).map((field) => {
+                                                return (<Fragment key={field}>
+                                                        <th
+                                                            scope="col"
+                                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                                        > Value
+                                                        </th>
+                                                        <th
+                                                            scope="col"
+                                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                                        >
+                                                            Indice
+                                                        </th>
+                                                    </Fragment>
+                                                )
+                                            })}
+                                        </tr>
 
-                                        <td className="px-6 py-4 whitespace-nowrap font-medium text-sm text-gray-500">{match.score}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <TripleButton value={match.status}/>
-                                        </td>
-                                    </tr>
-                                ))}
-                                </tbody>
+                                        </thead>
+                                        <tbody>
+                                        {data.map(({pairs, score, status, id}, matchIdx) => (
+                                            <tr key={id}
+                                                className={matchIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+
+                                                {(Object.entries(pairs).map((pair) => {
+                                                    const [name, {value1, value2, similarity}] = pair
+                                                    return <Fragment key={name}>
+                                                        <td
+                                                            className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{value1}{value2 ?
+                                                            <br/> : ''}{value2}</td>
+                                                        <td>{similarity}</td>
+                                                    </Fragment>
+                                                }))}
+
+                                                <td className="px-6 py-4 whitespace-nowrap font-medium text-sm text-gray-500">{score}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                    <TripleButton value={status}/>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        </tbody>
                                     </table>
                                 </div> : <Spinner msg={loading}/>}
                         </div>
