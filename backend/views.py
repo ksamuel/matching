@@ -13,7 +13,11 @@ from sqlalchemy.exc import DisconnectionError, DBAPIError, OperationalError
 
 from backend.cache import redis
 from backend.db import DBApi
-from backend.exceptions import DBColumnDoesNotExist
+from backend.exceptions import (
+    DBColumnDoesNotExist,
+    RequestedSampleIsTooBig,
+    InsufficientPopulationSize,
+)
 from backend.xml import MatchingConfigParser
 
 log = logging.getLogger(__name__)
@@ -127,9 +131,14 @@ def create_sample(request, datasource_id):
         count = int(request.data["count"])
         min = int(request.data["min"])
         max = int(request.data["max"])
-        pairs = api.sample(min, max, count)
         sample_id = str(uuid.uuid4())
-        redis.save_sample(sample_id, count, min, max, pairs)
+        try:
+
+            pairs = api.sample(min, max, count)
+        except InsufficientPopulationSize as e:
+            raise RequestedSampleIsTooBig(e.requested_size, e.actual_size)
+
+        redis.save_sample(datasource_id, sample_id, count, min, max, pairs)
         return Response({"sample_id": sample_id})
 
 

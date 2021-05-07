@@ -9,24 +9,24 @@ import 'rc-slider/assets/index.css'
 import findCurrentData from "./selectors"
 
 import {setCurrentDataSource, setCurrentSample} from "./sampleSlice"
-import {classNames, CONTROL_KEYS, Spinner, toFixedTrunc} from "./utils";
+import {classNames, CONTROL_KEYS, ErrorNotification, Spinner, toFixedTrunc} from "./utils";
 import {createSample, getDatasource, getScoreBoundaries} from "./api";
 
 const {Range} = Slider
 
 export default function SamplingConfiguration() {
 
-    let {datasourceId, sampleId} = useParams()
+    const {datasourceId, sampleId} = useParams()
     const history = useHistory()
     const dispatch = useDispatch()
 
-    let [count, setCount] = useState(300)
-    let [minScore, setMinScore] = useState(0)
-    let [maxScore, setMaxScore] = useState(10)
-    let [loading, setLoading] = useState('')
+    const [count, setCount] = useState(300)
+    const [minScore, setMinScore] = useState(0)
+    const [maxScore, setMaxScore] = useState(10)
+    const [loading, setLoading] = useState('')
+    const [errorMsg, setErrorMsg] = useState('')
 
-
-    let {currentDatasource} = findCurrentData({datasourceId, sampleId})
+    const {currentDatasource} = findCurrentData({datasourceId, sampleId})
 
     useEffect(() => {
 
@@ -34,22 +34,21 @@ export default function SamplingConfiguration() {
         if (!currentDatasource) {
             setLoading("Chargement de la source de donnée")
             getDatasource(datasourceId).then((response) => {
-
                 dispatch(setCurrentDataSource(response.data))
                 dispatch(setCurrentSample(null))
                 setLoading('')
-
             }).catch((error) => {
-
                 if (error.response.status === 404) {
                     history.push("/nodatasource/")
                 }
+                setErrorMsg(error.response.data)
             }).finally(() => {
                 setLoading('')
             })
 
 
         } else {
+
             dispatch(setCurrentDataSource(currentDatasource))
             dispatch(setCurrentSample(null))
             setLoading('')
@@ -62,10 +61,8 @@ export default function SamplingConfiguration() {
         }
 
 
-    }, [datasourceId, maxScore])
+    }, [sampleId, currentDatasource, maxScore])
 
-
-    let allowedMaxScore = 5
 
     const updateMinScore = (score) => {
         const cleanScore = parseFloat(score.replace(',', '.').replace(/[^\d.]/g, ''))
@@ -89,7 +86,7 @@ export default function SamplingConfiguration() {
             return
         }
 
-        if (cleanScore <= allowedMaxScore && cleanScore >= minScore) {
+        if (cleanScore <= maxScore && cleanScore >= minScore) {
             setMaxScore(toFixedTrunc(cleanScore, 2))
         }
     }
@@ -124,13 +121,19 @@ export default function SamplingConfiguration() {
 
 
     const requestSample = () => {
+        setErrorMsg('')
         setLoading("Echantillonnage en cours")
         createSample(currentDatasource.id, count, minScore, maxScore).then((response) => {
                 history.push(`/datasources/${currentDatasource.id}/samples/${response.data.sample_id}`)
             }
         ).catch((error) => {
-            console.log(error)
-            alert('Une erreur est survenue');
+            if (error.response.data.detail) {
+                setErrorMsg(error.response.data.detail)
+            } else {
+                setErrorMsg('Une erreur inconnue est survenue')
+                console.error(error)
+            }
+
         }).finally(() => {
             setLoading('')
         })
@@ -199,7 +202,7 @@ export default function SamplingConfiguration() {
 
                     <label className="text-xl " htmlFor="maxscore">Score max:</label>
 
-                    <input type="number" name="maxscore" value={maxScore} max={allowedMaxScore} min={0}
+                    <input type="number" name="maxscore" value={maxScore} max={maxScore} min={minScore}
                            onChange={(e) => updateMaxScore(e.target.value)}
                            onKeyDown={enforceFloat}
                            className={classNames(maxScore !== '' ? '' : "border-red-300 focus:border-red-300 border-4 focus:border-4",
@@ -239,8 +242,10 @@ export default function SamplingConfiguration() {
                     </form>
                 </main>
             </>
-            : <Spinner msg={loading}/>
-    }</>
+            : <Spinner msg={loading}/>}
+
+        {errorMsg && <ErrorNotification msg={errorMsg}/>}
+    </>
 
 
 }

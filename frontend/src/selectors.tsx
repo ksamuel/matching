@@ -3,6 +3,7 @@ import {useSelector} from "react-redux";
 export default function useCurrentData({datasourceId, sampleId}) {
     return useSelector((state) => {
 
+
         let currentDatasource = state.samples.datasources.filter((datasource) => {
             return datasource.id === datasourceId
         })[0]

@@ -5,7 +5,7 @@ from sqlalchemy import create_engine, Table, MetaData, func, column, update
 from sqlalchemy.future import select
 
 from backend.cache import redis
-from backend.exceptions import DBColumnDoesNotExist, InsuffisantSampleSize
+from backend.exceptions import DBColumnDoesNotExist, InsufficientPopulationSize
 from backend.xml import MatchingConfigParser
 
 
@@ -89,7 +89,7 @@ class DBApi:
 
         actual_size = len(results)
         if actual_size < size:
-            raise InsuffisantSampleSize(
+            raise InsufficientPopulationSize(
                 f"You requested {size} elements, but only {actual_size} are available",
                 requested_size=size,
                 actual_size=actual_size,
