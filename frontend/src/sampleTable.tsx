@@ -7,9 +7,12 @@ import findCurrentData from "./selectors"
 
 import {setCurrentDataSource, setCurrentSample} from "./sampleSlice"
 
-import {classNames, Spinner, zip} from "./utils";
+import {classNames, ErrorNotification, Spinner, zip} from "./utils";
 
 import axios from "axios";
+import {getDatasource} from "./api";
+import {sampleData} from ".testData"
+import dayjs from "dayjs";
 
 
 function StringComparison({first, second}) {
@@ -79,66 +82,149 @@ function TripleButton({value, onChange}) {
 
 export default function SampleTable() {
 
-    let {datasourceId, sampleId} = useParams()
-    let {currentDatasource, currentSample} = findCurrentData({datasourceId, sampleId})
-
-    let [data, setData] = useState(null)
-
-    // TODO: datasource and datasource DATA are not the same: data[0] is currenttly the data, but it should be the aprams
-
-    useEffect(() => {
-        (async () => {
-            try {
-                let response = await axios.get(`/api/v1/samples/${sampleId}/data`)
-                setData(response.data)
-                dispatch(setCurrentDataSource(currentDatasource))
-                dispatch(setCurrentSample(currentSample))
-            } catch (e) {
-                alert('Erreur réseau, veuillez recommencer.')
-                if (e.status_code === 404) {
-                    history.push("/nosample/")
-                }
-            }
-        })()
-    }, [sampleId])
-
-
     const history = useHistory()
     const dispatch = useDispatch()
 
+    const {datasourceId, sampleId} = useParams()
+    const {currentDatasource, currentSample} = findCurrentData({datasourceId, sampleId})
 
-    return (
-        <div className="flex flex-col">
-            <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-                    {data ?
-                        <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50">
-                                <tr>
-                                    {(data[0].pairs).map((pair) => {
-                                        return <th key={pair.name}
-                                                   scope="col"
-                                                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                        >
-                                            {pair.name}
-                                        </th>
-                                    })}
 
-                                    <th
-                                        scope="col"
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >
-                                        Score
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                    >
-                                        Status
-                                    </th>
+    const [loading, setLoading] = useState('')
+    const [data, setData] = useState(null)
+    const [errorMsg, setErrorMsg] = useState('')
 
-                                </tr>
+    // TODO: datasource and datasource DATA are not the same: data[0] is currenttly the data, but it should be the aprams
+
+
+    useEffect(() => {
+        if (!currentDatasource) {
+            setLoading("Chargement de la source de donnée")
+            getDatasource(datasourceId).then((response) => {
+                dispatch(setCurrentDataSource(response.data))
+
+            }).catch((error) => {
+                if (error.response.status === 404) {
+                    history.push("/nodatasource/")
+                }
+                setErrorMsg(error.response.data)
+            }).finally(() => {
+                setLoading('')
+            })
+
+
+        }
+    }, [datasourceId])
+
+    useEffect(() => {
+
+
+        if (!currentSample) {
+            (async () => {
+                try {
+                    setLoading("Chargement de l'échantillon")
+                    const paramResponse = await axios.get(`/api/v1/samples/${sampleId}/params`)
+                    dispatch(setCurrentSample(paramResponse.data))
+                    dispatch(setCurrentDataSource(currentDatasource))
+
+                } catch (e) {
+
+                    if (e.response.data.detail) {
+                        setErrorMsg(e.response.data.detail)
+                    } else {
+                        setErrorMsg("Une erreur inconnue est survenue")
+                        console.error(e)
+                    }
+                    if (e.status_code === 404) {
+                        history.push("/nosample/")
+                    }
+                } finally {
+                    setLoading('')
+                }
+            })()
+        } else {
+            dispatch(setCurrentDataSource(currentDatasource))
+            dispatch(setCurrentSample(currentSample))
+        }
+    }, [sampleId])
+
+
+    useEffect(() => {
+
+        if (!data) {
+            (async () => {
+                try {
+                    setLoading("Chargement de l'échantillon")
+                    const dataResponse = await axios.get(`/api/v1/samples/${sampleId}/data`)
+                    setData(dataResponse.data)
+
+                } catch (e) {
+
+                    if (e.response.data.detail) {
+                        setErrorMsg(e.response.data.detail)
+                    } else {
+                        setErrorMsg("Une erreur inconnue est survenue")
+                        console.error(e)
+                    }
+                    if (e.status_code === 404) {
+                        history.push("/nosample/")
+                    }
+                } finally {
+                    setLoading('')
+                }
+            })()
+        } else {
+            dispatch(setCurrentDataSource(currentDatasource))
+            dispatch(setCurrentSample(currentSample))
+        }
+    }, [sampleId, data])
+
+
+    return (<>
+            <header className="bg-white shadow">
+                <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                    <h1 className="text-3xl  text-gray-900"><span
+                        className={"font-bold  "}>Paires:</span> {currentSample.count}
+                        <span
+                            className={"font-bold ml-8"}>Score:</span> {currentSample.minScore} {currentSample.maxScore}
+                        <span
+                            className={"font-bold ml-8"}>Date:</span> {dayjs(currentSample.date).format('HH:mm:ss DD/MM/YYYY')}
+                    </h1>
+                    <p> Expire {dayjs(currentSample.expireDate).fromNow()}</p>
+                </div>
+            </header>
+            <main>
+                <div className="flex flex-col">
+
+                    <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                        <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                            {false && currentSample && data && data.length > 0 && loading === "" ?
+                                <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                                    <table className="min-w-full divide-y divide-gray-200">
+                                        <thead className="bg-gray-50">
+                                        <tr>
+                                            {(["foo", "bar", "baz"]).map((pair) => {
+                                                return <th key={pair}
+                                                           scope="col"
+                                                           className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                                >
+                                                    {pair.name}
+                                                </th>
+                                            })}
+
+                                            <th
+                                                scope="col"
+                                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                            >
+                                                Score
+                                            </th>
+                                            <th
+                                                scope="col"
+                                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                            >
+                                                Status
+                                            </th>
+
+                                        </tr>
                                 </thead>
                                 <tbody>
                                 {data.map((match, matchIdx) => (
@@ -158,10 +244,15 @@ export default function SampleTable() {
                                     </tr>
                                 ))}
                                 </tbody>
-                            </table>
-                        </div> : <Spinner msg={"Chargement"}/>}
+                                    </table>
+                                </div> : <Spinner msg={loading}/>}
+                        </div>
+                    </div>
+                    {
+                        errorMsg && <ErrorNotification msg={errorMsg}/>
+                    }
                 </div>
-            </div>
-        </div>
+            </main>
+        </>
     )
 }

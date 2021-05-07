@@ -9,7 +9,12 @@ from django.views.decorators.http import require_http_methods
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
-from sqlalchemy.exc import DisconnectionError, DBAPIError, OperationalError
+from sqlalchemy.exc import (
+    DisconnectionError,
+    DBAPIError,
+    OperationalError,
+    NoSuchTableError,
+)
 
 from backend.cache import redis
 from backend.db import DBApi
@@ -80,7 +85,7 @@ def upload_file(request):
 
             log.exception("Data base error in XML upload page.")
             return HttpResponse(
-                f"Une erreur est survenue en tentant d'accéder aux données d'échantillongage."
+                f"Une erreur est survenue en tentant d'accéder aux données d'échantillongage. "
                 "Le problème vient sans doute du logiciel, pas de votre part. Contactez votre service informatique.",
                 status=500,
             )
@@ -88,7 +93,16 @@ def upload_file(request):
         except DBColumnDoesNotExist as e:
             log.exception("XML contains bad column in XML upload page.")
             return HttpResponse(
-                f"Le XML contient la colonne '{e.column}' qui n'existe pas sur le serveur {xml.db_data()['netloc']}",
+                f"Le XML contient la colonne '{e.column}' qui n'existe pas sur le serveur '{xml.db_data()['netloc']}' "
+                f"dans la table '{xml.output_table()}' sous le schema '{xml.db_data()['schema']}'",
+                status=400,
+            )
+
+        except NoSuchTableError as e:
+            log.exception("XML contains bad table in XML upload page.")
+            return HttpResponse(
+                f"Le XML contient la table '{xml.output_table()}' "
+                f"'qui n'existe pas sur le serveur '{xml.db_data()['netloc']}' dans le schema '{xml.db_data()['schema']}'",
                 status=400,
             )
 
@@ -97,7 +111,7 @@ def upload_file(request):
             log.exception("Unknown error in XML upload page.")
 
             return HttpResponse(
-                f"Une erreur inconnue est survenue en tentant d'accéder aux données d'échantillongage."
+                f"Une erreur inconnue est survenue en tentant d'accéder aux données d'échantillongage. "
                 "Le problème vient sans doute du logiciel, pas de votre part. Contactez votre service informatique.",
                 status=500,
             )
@@ -129,8 +143,8 @@ def score_boundaries(request, datasource_id):
 def create_sample(request, datasource_id):
     with DBApi.db_from_cache(datasource_id) as api:
         count = int(request.data["count"])
-        min = int(request.data["min"])
-        max = int(request.data["max"])
+        min = float(request.data["min"])
+        max = float(request.data["max"])
         sample_id = str(uuid.uuid4())
         try:
 
@@ -139,12 +153,17 @@ def create_sample(request, datasource_id):
             raise RequestedSampleIsTooBig(e.requested_size, e.actual_size)
 
         redis.save_sample(datasource_id, sample_id, count, min, max, pairs)
-        return Response({"sample_id": sample_id})
+        return Response(redis.load_sample_params(sample_id))
 
 
 @api_view()
 def get_sample_data(request, sample_id):
     return Response(redis.load_sample(sample_id))
+
+
+@api_view()
+def get_sample_params(request, sample_id):
+    return Response(redis.load_sample_params(sample_id))
 
 
 @api_view()

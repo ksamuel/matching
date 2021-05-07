@@ -50,7 +50,7 @@ class RedisClient:
         source = self.get(self.DATASOURCE_SCHEMA_KEY.format(uid=uid))
         if source:
             source["samples"] = [
-                self.load_sample(sample_id)
+                self.load_sample_params(sample_id)
                 for sample_id in self.list_datasource_samples(uid)
             ]
             source["id"] = uid
@@ -94,7 +94,7 @@ class RedisClient:
         self.connexion.pexpire(key, expiration)
 
         self.connexion.zadd(
-            self.DATASOURCE_SAMPLE_LIST_KEY.format(uid=uid), {uid: expiration}
+            self.DATASOURCE_SAMPLE_LIST_KEY.format(uid=datasource_id), {uid: expiration}
         )
 
         self.extend_datasource_expiration(datasource_id)
@@ -120,9 +120,7 @@ class RedisClient:
         )
 
     def load_sample_params(self, uid):
-        return json.loads(
-            self.connexion.hgetall(self.SAMPLE_PARAMS_KEY.format(uid=uid))
-        )
+        return json.loads(self.connexion.get(self.SAMPLE_PARAMS_KEY.format(uid=uid)))
 
     def extend_datasource_expiration(self, uid):
         expiration = expiration_timestamp()

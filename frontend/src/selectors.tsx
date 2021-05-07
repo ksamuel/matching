@@ -9,6 +9,7 @@ export default function useCurrentData({datasourceId, sampleId}) {
         })[0]
 
         if (currentDatasource) {
+ 
             let currentSample = currentDatasource.samples.filter((sample) => {
                 return sample.id === sampleId
             })[0]

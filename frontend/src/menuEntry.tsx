@@ -44,12 +44,12 @@ export default function MenuEntry({datasource, currentDatasource, currentSample}
                 {datasource.samples.map((sample) => (
                     <Link key={sample.id}
                           onClick={e => e.stopPropagation()}
-                          to={`/datasources/${datasource.id}/sample/${sample.id}/`}
+                          to={`/datasources/${datasource.id}/samples/${sample.id}/`}
                           className={classNames(currentSample && currentSample.id === sample.id ? "border-l-4 border-blue-800 font-black bg-blue-50" : "", "group w-full flex  pl-3 pr-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:text-gray-900 hover:bg-gray-50")}>
                         <ul>
                             <li>Score: {sample.minScore}-{sample.maxScore}</li>
                             <li>Paires: {sample.count}</li>
-                            <li>Date: {dayjs(sample.date).format('DD/MM/YYYY HH:mm:ss')}</li>
+                            <li>Date: {dayjs(sample.date).format('HH:mm:ss DD/MM/YYYY')}</li>
                             <li className="text-xs text-gray-400">Expire: {dayjs(sample.expireDate).fromNow()} < /li>
                         </ul>
                     </Link>

@@ -24,12 +24,14 @@ from backend.views import (
     datasource,
     get_sample_data,
     create_sample,
+    get_sample_params,
 )
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/v1/sample/<int:sample_id>/", sample),
     re_path("api/v1/samples/(?P<sample_id>[0-9a-f-]{36})/data/", get_sample_data),
+    re_path("api/v1/samples/(?P<sample_id>[0-9a-f-]{36})/params/", get_sample_params),
     re_path(
         "api/v1/datasources/(?P<datasource_id>[0-9a-f]{64})/scoreboundaries/",
         score_boundaries,
