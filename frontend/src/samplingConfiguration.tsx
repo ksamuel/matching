@@ -8,7 +8,7 @@ import 'rc-slider/assets/index.css'
 
 import findCurrentData from "./selectors"
 
-import {setCurrentDataSource, setCurrentSample} from "./sampleSlice"
+import {addSampleToDataSource, setCurrentDataSource, setCurrentSample} from "./sampleSlice"
 import {classNames, CONTROL_KEYS, ErrorNotification, Spinner, toFixedTrunc} from "./utils";
 import {createSample, getDatasource, getScoreBoundaries} from "./api";
 
@@ -26,6 +26,9 @@ export default function SamplingConfiguration() {
     const [loading, setLoading] = useState('')
     const [errorMsg, setErrorMsg] = useState('')
 
+    const [maxScoreBoundary, setMaxScoreBoundary] = useState(10)
+    const [minScoreBoundary, setMinScoreBoundary] = useState(10)
+
     const {currentDatasource} = findCurrentData({datasourceId, sampleId})
 
     useEffect(() => {
@@ -36,7 +39,7 @@ export default function SamplingConfiguration() {
             getDatasource(datasourceId).then((response) => {
                 dispatch(setCurrentDataSource(response.data))
                 dispatch(setCurrentSample(null))
-                setLoading('')
+
             }).catch((error) => {
                 if (error.response.status === 404) {
                     history.push("/nodatasource/")
@@ -57,6 +60,8 @@ export default function SamplingConfiguration() {
             getScoreBoundaries(datasourceId).then((response) => {
                 setMinScore(response.data.min)
                 setMaxScore(response.data.max)
+                setMinScoreBoundary(response.data.min)
+                setMaxScoreBoundary(response.data.max)
             })
         }
 
@@ -71,7 +76,7 @@ export default function SamplingConfiguration() {
             return
         }
 
-        if (cleanScore <= maxScore) {
+        if (cleanScore <= maxScore && cleanScore > minScoreBoundary) {
             setMinScore(toFixedTrunc(cleanScore, 2))
         }
 
@@ -86,7 +91,7 @@ export default function SamplingConfiguration() {
             return
         }
 
-        if (cleanScore <= maxScore && cleanScore >= minScore) {
+        if (cleanScore <= maxScoreBoundary && cleanScore >= minScore) {
             setMaxScore(toFixedTrunc(cleanScore, 2))
         }
     }
@@ -123,8 +128,11 @@ export default function SamplingConfiguration() {
     const requestSample = () => {
         setErrorMsg('')
         setLoading("Echantillonnage en cours")
+
         createSample(currentDatasource.id, count, minScore, maxScore).then((response) => {
-                history.push(`/datasources/${currentDatasource.id}/samples/${response.data.sample_id}`)
+                console.log(response.data)
+                dispatch(addSampleToDataSource(response.data))
+                history.push(`/datasources/${currentDatasource.id}/samples/${response.data.id}`)
             }
         ).catch((error) => {
             if (error.response.data.detail) {
@@ -174,11 +182,11 @@ export default function SamplingConfiguration() {
                     />
                     </span>
                     </span>
-                                    <span className="flex-initial mr-8 text-gray-400">0</span>
+                                    <span className="flex-initial mr-8 text-gray-300">0</span>
                                     <span className="flex-1">
-                    <Slider min={0} max={300} step={50} value={count} onChange={setCount}/>
+                    <Slider min={0} max={300} step={1} value={count} onChange={setCount}/>
                     </span>
-                                    <span className="flex-initial ml-8 text-gray-400">300</span>
+                                    <span className="flex-initial ml-8 text-gray-300">300</span>
 
 
                                 </div>
@@ -188,7 +196,7 @@ export default function SamplingConfiguration() {
                     <span className="flex-initial w-1/4 ">
                     <label className="text-xl  w-44" htmlFor="minscore">Score min: &nbsp;&nbsp;</label>
 
-                    <input type="number" name="minscore" value={minScore} max={maxScore} min={0}
+                    <input type="number" name="minscore" value={minScore} max={maxScore} min={minScoreBoundary}
                            onChange={(e) => updateMinScore(e.target.value)}
                            onKeyDown={enforceFloat}
                            className={classNames(minScore !== '' ? '' : "border-red-300 focus:border-red-300 border-4 focus:border-4",
@@ -202,7 +210,7 @@ export default function SamplingConfiguration() {
 
                     <label className="text-xl " htmlFor="maxscore">Score max:</label>
 
-                    <input type="number" name="maxscore" value={maxScore} max={maxScore} min={minScore}
+                    <input type="number" name="maxscore" value={maxScore} max={maxScoreBoundary} min={minScore}
                            onChange={(e) => updateMaxScore(e.target.value)}
                            onKeyDown={enforceFloat}
                            className={classNames(maxScore !== '' ? '' : "border-red-300 focus:border-red-300 border-4 focus:border-4",
@@ -210,13 +218,13 @@ export default function SamplingConfiguration() {
                     />
 
                     </span>
-                                    <span className="flex-initial mr-4 text-gray-400">{minScore}</span>
+                                    <span className="flex-initial mr-4 text-gray-300">{minScoreBoundary}</span>
                                     <span className="flex-1">
-                    <Range min={minScore * 100} max={maxScore * 100} allowCross={false} step={10}
+                    <Range min={minScoreBoundary * 100} max={maxScoreBoundary * 100} allowCross={false} step={1}
                            value={[minScore * 100, maxScore * 100]}
                            onChange={([min, max]) => [setMinScore(min / 100), setMaxScore(max / 100)]}/>
                     </span>
-                                    <span className="flex-initial ml-8 text-gray-400">{maxScore}</span>
+                                    <span className="flex-initial ml-8 text-gray-300">{maxScoreBoundary}</span>
 
                                 </div>
 

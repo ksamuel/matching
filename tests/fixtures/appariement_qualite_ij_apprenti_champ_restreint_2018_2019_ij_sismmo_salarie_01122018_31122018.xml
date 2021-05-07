@@ -1,8 +1,8 @@
 <specificationRecordlinkage>
 	<databaseParameter>
-		<serverParameter port="5432" server="cisad72" />
-		<userParameter password="****" user="inserjeunes_rw" />
-		<baseParameter database="inserjeunes_rec_traitements" schema="work_appariement_qualite_2017_2018" />
+		<serverParameter port="5432" server="localhost" />
+		<userParameter password="****" user="matching_db" />
+		<baseParameter database="matching_db" schema="work_appariement_qualite_2017_2018" />
 	</databaseParameter>
 	<inputTable primaryKeyName="ID_INE_RNIE" tableName="IJ_APPRENTI_CHAMP_RESTREINT">
 		<column name="NOM_1_R" />

@@ -79,7 +79,7 @@ export function ErrorNotification({msg}) {
                         leaveTo="opacity-0"
                     >
                         <div
-                            className="max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden">
+                            className="max-w-lg w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden">
                             <div className="p-4">
                                 <div className="flex items-start">
                                     <div className="flex-shrink-0">
