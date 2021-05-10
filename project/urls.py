@@ -25,11 +25,16 @@ from backend.views import (
     get_sample_data,
     create_sample,
     get_sample_params,
+    update_pair_status,
 )
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/v1/sample/<int:sample_id>/", sample),
+    re_path(
+        "api/v1/samples/(?P<sample_id>[0-9a-f-]{36})/pairs/(?P<pair_id>[0-9A-Z]+)/status",
+        update_pair_status,
+    ),
     re_path("api/v1/samples/(?P<sample_id>[0-9a-f-]{36})/data/", get_sample_data),
     re_path("api/v1/samples/(?P<sample_id>[0-9a-f-]{36})/params/", get_sample_params),
     re_path(

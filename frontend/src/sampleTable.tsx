@@ -110,74 +110,58 @@ export default function SampleTable() {
             }).finally(() => {
                 setLoading('')
             })
-
-
         }
     }, [datasourceId])
 
     useEffect(() => {
+        (async () => {
+            try {
+                setLoading("Chargement de l'échantillon")
+                const paramResponse = await axios.get(`/api/v1/samples/${sampleId}/params`)
+                dispatch(setCurrentSample(paramResponse.data))
+                dispatch(setCurrentDataSource(currentDatasource))
 
+            } catch (e) {
 
-        if (!currentSample) {
-            (async () => {
-                try {
-                    setLoading("Chargement de l'échantillon")
-                    const paramResponse = await axios.get(`/api/v1/samples/${sampleId}/params`)
-                    dispatch(setCurrentSample(paramResponse.data))
-                    dispatch(setCurrentDataSource(currentDatasource))
-
-                } catch (e) {
-
-                    if (e.response.data.detail) {
-                        setErrorMsg(e.response.data.detail)
-                    } else {
-                        setErrorMsg("Une erreur inconnue est survenue")
-                        console.error(e)
-                    }
-                    if (e.status_code === 404) {
-                        history.push("/nosample/")
-                    }
-                } finally {
-                    setLoading('')
+                if (e.response.data.detail) {
+                    setErrorMsg(e.response.data.detail)
+                } else {
+                    setErrorMsg("Une erreur inconnue est survenue")
+                    console.error(e)
                 }
-            })()
-        } else {
-            dispatch(setCurrentDataSource(currentDatasource))
-            dispatch(setCurrentSample(currentSample))
-        }
+                if (e.status_code === 404) {
+                    history.push("/nosample/")
+                }
+            } finally {
+                setLoading('')
+            }
+        })()
+
     }, [sampleId])
 
 
     useEffect(() => {
-
-        if (!data.length) {
-            (async () => {
-                try {
-                    setLoading("Chargement de l'échantillon")
-                    const dataResponse = await axios.get(`/api/v1/samples/${sampleId}/data`)
-                    console.log(dataResponse.data)
-                    setData(dataResponse.data)
-
-                } catch (e) {
-
-                    if (e.response.data.detail) {
-                        setErrorMsg(e.response.data.detail)
-                    } else {
-                        setErrorMsg("Une erreur inconnue est survenue")
-                        console.error(e)
-                    }
-                    if (e.status_code === 404) {
-                        history.push("/nosample/")
-                    }
-                } finally {
-                    setLoading('')
+        (async () => {
+            try {
+                setLoading("Chargement de l'échantillon")
+                const dataResponse = await axios.get(`/api/v1/samples/${sampleId}/data`)
+                setData(dataResponse.data)
+            } catch (e) {
+                if (e.response.data.detail) {
+                    setErrorMsg(e.response.data.detail)
+                } else {
+                    setErrorMsg("Une erreur inconnue est survenue")
+                    console.error(e)
                 }
-            })()
-        } else {
-            dispatch(setCurrentDataSource(currentDatasource))
-            dispatch(setCurrentSample(currentSample))
-        }
-    }, [sampleId, data])
+                if (e.status_code === 404) {
+                    history.push("/nosample/")
+                }
+            } finally {
+                setLoading('')
+            }
+        })()
+
+    }, [sampleId])
 
     const updatePairStatus = (value, pair_id) => {
         axios.put(`/api/v1/samples/${currentSample.id}/pairs/${pair_id}/status`, {'status': value})
