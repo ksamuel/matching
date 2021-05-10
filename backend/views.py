@@ -145,6 +145,10 @@ def create_sample(request, datasource_id):
     try:
         with DBApi.db_from_cache(datasource_id) as api:
             count = int(request.data["count"])
+
+            if not count:
+                return HttpResponse(f"'count' doit être un nombre positif", status=400)
+
             min = float(request.data["min"])
             max = float(request.data["max"])
             sample_id = str(uuid.uuid4())

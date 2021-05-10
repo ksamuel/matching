@@ -184,7 +184,7 @@ export default function SamplingConfiguration() {
                     <input type="number" name="count" value={count} max={1000} min={0}
                            onChange={(e) => updateCount(e.target.value)}
                            onKeyDown={enforceInteger}
-                           className={classNames(count !== '' ? '' : "border-red-300 focus:border-red-300 border-4 focus:border-4",
+                           className={classNames(count ? '' : "border-red-300 focus:border-red-300 border-4 focus:border-4",
                                "w-20 mx-8 text-right")}
                     />
                     </span>
@@ -243,7 +243,7 @@ export default function SamplingConfiguration() {
                                             e.preventDefault();
                                             requestSample()
                                         }}
-                                                disabled={count === '' || maxScore === '' || minScore === ''}
+                                                disabled={!count || maxScore === '' || minScore === ''}
                                                 className="disabled:opacity-30  m-8 inline-flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-2xl">
                                             Lancer l'échantillonnage
                                         </button>
