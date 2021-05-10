@@ -20,36 +20,36 @@ export default function Layout() {
             <Sidebar></Sidebar>
 
 
-            <div className="flex flex-col w-0 flex-1 overflow-hidden">
+            <Switch>
 
 
-                <Switch>
+                <Route exact path="/">
 
-
-                    <Route exact path="/">
+                    <div className="flex flex-col w-0 flex-1 overflow-hidden">
                         <Dropzone/>
-                    </Route>
+                    </div>
+                </Route>
 
-                    <Route exact path="/datasources/:datasourceId/samples/:sampleId/">
-                        <SampleTable/>
-                    </Route>
+                <Route exact path="/datasources/:datasourceId/samples/:sampleId/">
+                    <div className="flex flex-col w-0 flex-1 overflow-x-hidden overflow-y-scroll"><SampleTable/></div>
+                </Route>
 
-                    <Route exact path="/datasources/:datasourceId/">
-                        <SamplingConfiguration/>
-                    </Route>
+                <Route exact path="/datasources/:datasourceId/">
+                    <div className="flex flex-col w-0 flex-1 overflow-hidden"><SamplingConfiguration/></div>
+                </Route>
 
-                    <Route path="/nodatasource/">
-                        <NoDatasource/>
-                    </Route>
+                <Route path="/nodatasource/">
+                    <div className="flex flex-col w-0 flex-1 overflow-hidden"><NoDatasource/></div>
+                </Route>
 
-                    <Route path="/nosample/">
-                        <NoSample/>
-                    </Route>
+                <Route path="/nosample/">
+                    <div className="flex flex-col w-0 flex-1 overflow-hidden"><NoSample/></div>
+                </Route>
 
 
-                </Switch>
+            </Switch>
 
-            </div>
+
         </div>
     )
 }

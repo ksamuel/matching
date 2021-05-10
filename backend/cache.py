@@ -107,6 +107,15 @@ class RedisClient:
             ).items()
         ]
 
+    def update_pair_status(self, sample_id, pair_id, status):
+        pair = json.loads(
+            self.connexion.hget(self.SAMPLE_DATA_KEY.format(uid=sample_id), pair_id)
+        )
+        pair["status"] = status
+        self.connexion.hset(
+            self.SAMPLE_DATA_KEY.format(uid=sample_id), pair_id, json.dumps(pair)
+        )
+
     def list_datasource_samples(self, datasource_id):
         return reversed(
             [

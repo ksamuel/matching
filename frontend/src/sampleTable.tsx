@@ -87,7 +87,7 @@ export default function SampleTable() {
 
     const {datasourceId, sampleId} = useParams()
     const {currentDatasource, currentSample} = findCurrentData({datasourceId, sampleId})
-
+    let schema;
 
     const [loading, setLoading] = useState('')
     const [data, setData] = useState([])
@@ -179,7 +179,13 @@ export default function SampleTable() {
         }
     }, [sampleId, data])
 
-    console.log(data)
+    const updatePairStatus = (value, pair_id) => {
+        axios.put(`/api/v1/samples/${currentSample.id}/pairs/${pair_id}/status`, {'status': value})
+    }
+
+    if (currentDatasource) {
+        schema = currentDatasource['schema']
+    }
 
     return (<> {currentDatasource &&
         <header className="bg-white shadow">
@@ -208,11 +214,11 @@ export default function SampleTable() {
                                     <table className="min-w-full divide-y divide-gray-200">
                                         <thead className="bg-gray-50">
                                         <tr>
-                                            {Object.keys(currentDatasource['schema']).map((field) => {
+                                            {Object.keys(schema).map((field) => {
                                                 return <th key={field}
                                                            scope="col"
                                                            colSpan={2}
-                                                           className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                                           className="  py-3 border border-gray-300 w-8 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                                                 >
                                                     {field}
                                                 </th>
@@ -221,14 +227,14 @@ export default function SampleTable() {
                                             <th
                                                 scope="col"
                                                 rowSpan={2}
-                                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                                className="   border border-gray-300 w-8 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                                             >
                                                 Score
                                             </th>
                                             <th
                                                 scope="col"
                                                 rowSpan={2}
-                                                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                                className="   border border-gray-300 w-8 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                                             >
                                                 Status
                                             </th>
@@ -240,14 +246,14 @@ export default function SampleTable() {
                                                 return (<Fragment key={field}>
                                                         <th
                                                             scope="col"
-                                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                                        > Value
+                                                            className="px-6 py-2 border border-gray-300 w-8 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                                        > Paire
                                                         </th>
                                                         <th
                                                             scope="col"
-                                                            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                                            className="px-6 py-2 border border-gray-300 w-8 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                                                         >
-                                                            Indice
+                                                            Similarité
                                                         </th>
                                                     </Fragment>
                                                 )
@@ -264,15 +270,16 @@ export default function SampleTable() {
                                                     const [name, {value1, value2, similarity}] = pair
                                                     return <Fragment key={name}>
                                                         <td
-                                                            className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{value1}{value2 ?
+                                                            className={classNames(schema[name].type !== "name" ? "text-center" : "", "px-2 border border-gray-300 w-8 whitespace-nowrap text-sm text-gray-500")}>{value1}{value2 ?
                                                             <br/> : ''}{value2}</td>
-                                                        <td>{similarity}</td>
+                                                        <td className="  text-center   whitespace-nowrap border border-gray-300   text-sm text-gray-500 ">{similarity}</td>
                                                     </Fragment>
                                                 }))}
 
-                                                <td className="px-6 py-4 whitespace-nowrap font-medium text-sm text-gray-500">{score}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                    <TripleButton value={status}/>
+                                                <td className="px-4 py-4 whitespace-nowrap text-center border border-gray-300 w-8 font-medium text-sm text-gray-500">{score}</td>
+                                                <td className="px-2 py-4 whitespace-nowrap text-center text-sm border border-gray-300   font-medium">
+                                                    <TripleButton value={status}
+                                                                  onChange={(value) => updatePairStatus(value, id)}/>
                                                 </td>
                                             </tr>
                                         ))}

@@ -57,9 +57,19 @@ class DBApi:
         }
 
     def sample(self, min_score, max_score, size):
+        print(
+            self.connection.execute(
+                select(func.count(self.table.c.id))
+                    .select_from(self.table)
+                    .where(self.table.c.poids.is_(None))
+            ).scalar(),
+            size,
+        )
         weight = (
             self.connection.execute(
-                select(func.count()).select_from(self.table)
+                select(func.count(self.table.c.id))
+                    .select_from(self.table)
+                    .where(self.table.c.poids.is_(None))
             ).scalar()
             / size
         )

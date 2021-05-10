@@ -156,6 +156,12 @@ def create_sample(request, datasource_id):
         return Response(redis.load_sample_params(sample_id))
 
 
+@api_view(["PUT"])
+def update_pair_status(request, sample_id, pair_id):
+    redis.update_pair_status(sample_id, pair_id, request.data["status"])
+    return Response("ok")
+
+
 @api_view()
 def get_sample_data(request, sample_id):
     sample = redis.load_sample(sample_id)
@@ -246,39 +252,41 @@ def get_sample_data(request, sample_id):
 
     example = {
         "pairs": {
-            "similarite_nom": {
-                "value1": "sissoko",
-                "value2": "bord",
-                "similarity": 0.0
-            }
+            "similarite_nom": {"value1": "sissoko", "value2": "bord", "similarity": 0.0}
         },
-        'score':  0.476570781893004,
-        'status': None
+        "score": 0.476570781893004,
+        "status": None,
     }
 
     sample_table = []
     for row in sample:
 
         table_line = {
-            'score': row['score_confiance'],
-            'status': row.get('status', None),
-            'id': row['id'],
+            "score": f"{row['score_confiance']:.2f}",
+            "status": row.get("status", None),
+            "id": row["id"],
         }
-        table_line['pairs'] = pairs = {}
+        table_line["pairs"] = pairs = {}
 
         for similarity_name, structure in schema.items():
-            names = structure['cols']
-            field_type = structure['type']
+            names = structure["cols"]
+            field_type = structure["type"]
 
             fields1_names, fields2_names = [
-                [name  for name in names] for _, names in names.items()
+                [name for name in names] for _, names in names.items()
             ]
 
-            sep = '/' if field_type == "date" else " "
+            if field_type == "date":
+                sep = "/"
+                formatter = lambda x: str(x or "").zfill(2)
+            else:
+                sep = " "
+                formatter = lambda x: str(x or "").title()
+
             pairs[similarity_name] = {
-                "value1": sep.join(str(row[name] or '') for name in fields1_names),
-                "value2": sep.join(str(row[name] or '') for name in fields2_names),
-                "similarity": row[similarity_name]
+                "value1": sep.join(formatter(row[name]) for name in fields1_names),
+                "value2": sep.join(formatter(row[name]) for name in fields2_names),
+                "similarity": f"{row[similarity_name]:.2f}",
             }
 
         sample_table.append(table_line)
