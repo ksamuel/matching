@@ -252,11 +252,13 @@ export default function SampleTable() {
 
                                         </thead>
                                         <tbody>
-                                        {data.map(({pairs, score, status, id}, matchIdx) => (
-                                            <tr key={id}
-                                                className={matchIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                                        {data.map(({pairs, score, status, id}, matchIdx) => {
+                                            console.log(status)
+                                            return <tr key={id}
+                                                       className={matchIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
 
                                                 {(Object.entries(pairs).map((pair) => {
+
                                                     const [name, {value1, value2, similarity}] = pair
                                                     return <Fragment key={name}>
                                                         <td
@@ -272,7 +274,7 @@ export default function SampleTable() {
                                                                   onChange={(value) => updatePairStatus(value, id)}/>
                                                 </td>
                                             </tr>
-                                        ))}
+                                        })}
                                         </tbody>
                                     </table>
                                 </div> : <Spinner msg={loading}/>}

@@ -102,6 +102,13 @@ class DBApi:
             update(self.table).values({self.table.c.poids: None})
         )
 
+    def update_pair_status(self, pair_id, status):
+        self.connection.execute(
+            update(self.table)
+                .where(self.table.c.id == pair_id)
+                .values({self.table.c.prediction_annotation: status})
+        )
+
     @classmethod
     @contextmanager
     def db_from_xml(cls, xml):

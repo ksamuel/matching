@@ -1,6 +1,7 @@
 import logging
 import uuid
 from difflib import ndiff
+from operator import itemgetter
 
 from django import forms
 from django.http import HttpResponse
@@ -158,8 +159,11 @@ def create_sample(request, datasource_id):
 
 @api_view(["PUT"])
 def update_pair_status(request, sample_id, pair_id):
-    redis.update_pair_status(sample_id, pair_id, request.data["status"])
-    return Response("ok")
+    datasource_id = redis.load_sample_params(sample_id)["datasource"]
+    with DBApi.db_from_cache(datasource_id) as api:
+        api.update_pair_status(pair_id, request.data["status"])
+        redis.update_pair_status(sample_id, pair_id, request.data["status"])
+        return Response("ok")
 
 
 @api_view()
@@ -167,96 +171,6 @@ def get_sample_data(request, sample_id):
     sample = redis.load_sample(sample_id)
     datasource = redis.load_sample_params(sample_id)["datasource"]
     schema = redis.load_datasource(datasource)["schema"]
-
-    schema = {
-        "similarite_nom": {
-            "cols": {
-                "ij_apprenti_champ": [
-                    "nom_1_r_ij_apprenti_champ",
-                    "nom_2_r_ij_apprenti_champ",
-                ],
-                "ij_sia_apprenti_decembre": [
-                    "nom_1_r_ij_sia_apprenti_decembre",
-                    "nom_2_r_ij_sia_apprenti_decembre",
-                ],
-            },
-            "type": "name",
-        },
-        "similarite_prenom": {
-            "cols": {
-                "ij_apprenti_champ": [
-                    "prenom_1_r_ij_apprenti_champ",
-                    "prenom_2_r_ij_apprenti_champ",
-                    "prenom_3_r_ij_apprenti_champ",
-                ],
-                "ij_sia_apprenti_decembre": [
-                    "prenom_1_r_ij_sia_apprenti_decembre",
-                    "prenom_2_r_ij_sia_apprenti_decembre",
-                    "prenom_3_r_ij_sia_apprenti_decembre",
-                ],
-            },
-            "type": "name",
-        },
-        "similarite_datenaissance": {
-            "cols": {
-                "ij_apprenti_champ": [
-                    "jour_naissance_ij_apprenti_champ",
-                    "mois_naissance_ij_apprenti_champ",
-                    "annee_naissance_ij_apprenti_champ",
-                ],
-                "ij_sia_apprenti_decembre": [
-                    "jour_naissance_ij_sia_apprenti_decembre",
-                    "mois_naissance_ij_sia_apprenti_decembre",
-                    "annee_naissance_ij_sia_apprenti_decembre",
-                ],
-            },
-            "type": "date",
-        },
-        "similarite_sexe": {
-            "cols": {
-                "ij_apprenti_champ": ["sexe_ij_apprenti_champ"],
-                "ij_sia_apprenti_decembre": ["sexe_ij_sia_apprenti_decembre"],
-            },
-            "type": "verbatim",
-        },
-    }
-
-    row = {
-        "id": "040007485GJ1900030015",
-        "nom_1_r_ij_apprenti_champ": "SISSOKO",
-        "nom_2_r_ij_apprenti_champ": None,
-        "nom_1_r_ij_sia_apprenti_decembre": "BORD",
-        "nom_2_r_ij_sia_apprenti_decembre": None,
-        "similarite_nom": 0.0,
-        "prenom_1_r_ij_apprenti_champ": "SIDI",
-        "prenom_2_r_ij_apprenti_champ": "LAMINE",
-        "prenom_3_r_ij_apprenti_champ": "DJIBRIL",
-        "prenom_1_r_ij_sia_apprenti_decembre": "JULIEN",
-        "prenom_2_r_ij_sia_apprenti_decembre": None,
-        "prenom_3_r_ij_sia_apprenti_decembre": None,
-        "similarite_prenom": 0.5444444444444443,
-        "jour_naissance_ij_apprenti_champ": 19,
-        "mois_naissance_ij_apprenti_champ": 10,
-        "annee_naissance_ij_apprenti_champ": 2001,
-        "jour_naissance_ij_sia_apprenti_decembre": 19,
-        "mois_naissance_ij_sia_apprenti_decembre": 10,
-        "annee_naissance_ij_sia_apprenti_decembre": 2001,
-        "similarite_datenaissance": 1.0,
-        "sexe_ij_apprenti_champ": 1,
-        "sexe_ij_sia_apprenti_decembre": 1,
-        "similarite_sexe": 1,
-        "score_confiance": 0.476570781893004,
-        "prediction_annotation": None,
-        "poids": 6.673333333333333,
-    }
-
-    example = {
-        "pairs": {
-            "similarite_nom": {"value1": "sissoko", "value2": "bord", "similarity": 0.0}
-        },
-        "score": 0.476570781893004,
-        "status": None,
-    }
 
     sample_table = []
     for row in sample:
@@ -291,6 +205,7 @@ def get_sample_data(request, sample_id):
 
         sample_table.append(table_line)
 
+    sample_table.sort(key=itemgetter("id"))
     return Response(sample_table)
 
 
