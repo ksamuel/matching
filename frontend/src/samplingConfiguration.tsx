@@ -148,6 +148,7 @@ export default function SamplingConfiguration() {
 
     }
 
+
     return <>{
         currentDatasource && loading === '' ? <>
                 <header className="bg-white shadow">
@@ -157,16 +158,22 @@ export default function SamplingConfiguration() {
                     </div>
                 </header>
                 <main>
-                    <form action='' onSubmit={(e) => {
 
-                        e.preventDefault();
-                        requestSample()
-                    }}>
-                        <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+                    {typeof minScore != typeof 1 ?
+                        <div className={"p-4 flex flex items-center justify-center flex-col"}><h2
+                            className="my-4 text-2xl font-extrabold tracking-tight sm:text-1xl lg:text-1xl text-gray-600 pb-5 ">
+                            Il n'y a plus de paires à annoter </h2></div> :
 
-                            <div className="px-4 py-6 sm:px-0">
+                        <form action='' onSubmit={(e) => {
 
-                                <div className="text-xl mb-4 flex items-center">
+                            e.preventDefault();
+                            requestSample()
+                        }}>
+                            <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+
+                                <div className="px-4 py-6 sm:px-0">
+
+                                    <div className="text-xl mb-4 flex items-center">
 
                     <span className="flex-initial w-1/2 ">
                     <span className="text-xl "><label
@@ -182,16 +189,16 @@ export default function SamplingConfiguration() {
                     />
                     </span>
                     </span>
-                                    <span className="flex-initial mr-8 text-gray-300">0</span>
-                                    <span className="flex-1">
+                                        <span className="flex-initial mr-8 text-gray-300">0</span>
+                                        <span className="flex-1">
                     <Slider min={0} max={300} step={1} value={count} onChange={setCount}/>
                     </span>
-                                    <span className="flex-initial ml-8 text-gray-300">300</span>
+                                        <span className="flex-initial ml-8 text-gray-300">300</span>
 
 
-                                </div>
+                                    </div>
 
-                                <div className="text-xl mb-4 flex items-center">
+                                    <div className="text-xl mb-4 flex items-center">
 
                     <span className="flex-initial w-1/4 ">
                     <label className="text-xl  w-44" htmlFor="minscore">Score min: &nbsp;&nbsp;</label>
@@ -205,7 +212,7 @@ export default function SamplingConfiguration() {
 
                     </span>
 
-                                    <span className="flex-initial w-1/4 ">
+                                        <span className="flex-initial w-1/4 ">
 
 
                     <label className="text-xl " htmlFor="maxscore">Score max:</label>
@@ -218,36 +225,36 @@ export default function SamplingConfiguration() {
                     />
 
                     </span>
-                                    <span className="flex-initial mr-4 text-gray-300">{minScoreBoundary}</span>
-                                    <span className="flex-1">
+                                        <span className="flex-initial mr-4 text-gray-300">{minScoreBoundary}</span>
+                                        <span className="flex-1">
                     <Range min={minScoreBoundary * 100} max={maxScoreBoundary * 100} allowCross={false} step={1}
                            value={[minScore * 100, maxScore * 100]}
                            onChange={([min, max]) => [setMinScore(min / 100), setMaxScore(max / 100)]}/>
                     </span>
-                                    <span className="flex-initial ml-8 text-gray-300">{maxScoreBoundary}</span>
+                                        <span className="flex-initial ml-8 text-gray-300">{maxScoreBoundary}</span>
 
-                                </div>
+                                    </div>
 
-                                <div className="flex justify-center">
+                                    <div className="flex justify-center">
 
 
-                                    <button type="button" onClick={(e) => {
+                                        <button type="button" onClick={(e) => {
 
-                                        e.preventDefault();
-                                        requestSample()
-                                    }}
-                                            disabled={count === '' || maxScore === '' || minScore === ''}
-                                            className="disabled:opacity-30  m-8 inline-flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-2xl">
-                                        Lancer l'échantillonnage
-                                    </button>
+                                            e.preventDefault();
+                                            requestSample()
+                                        }}
+                                                disabled={count === '' || maxScore === '' || minScore === ''}
+                                                className="disabled:opacity-30  m-8 inline-flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-2xl">
+                                            Lancer l'échantillonnage
+                                        </button>
 
+
+                                    </div>
 
                                 </div>
 
                             </div>
-
-                        </div>
-                    </form>
+                        </form>}
                 </main>
             </>
             : <Spinner msg={loading}/>}

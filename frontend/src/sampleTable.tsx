@@ -253,7 +253,7 @@ export default function SampleTable() {
                                         </thead>
                                         <tbody>
                                         {data.map(({pairs, score, status, id}, matchIdx) => {
-                                            console.log(status)
+
                                             return <tr key={id}
                                                        className={matchIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
 

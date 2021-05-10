@@ -38,6 +38,7 @@ class DBApi:
                 )
 
     def get_score_boundaries(self):
+
         min_score, max_score = self.connection.execute(
             select(
                 func.min(self.table.c.score_confiance),
@@ -46,6 +47,9 @@ class DBApi:
                 .select_from(self.table)
                 .where(self.table.c.poids.is_(None))
         ).one()
+
+        if None in (min_score, max_score):
+            return None, None
 
         return {
             "min": float(
