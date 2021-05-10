@@ -107,8 +107,6 @@ export default function SampleTable() {
                     history.push("/nodatasource/")
                 }
                 setErrorMsg(error.response.data)
-            }).finally(() => {
-                setLoading('')
             })
         }
     }, [datasourceId])
@@ -117,6 +115,7 @@ export default function SampleTable() {
         (async () => {
             try {
                 setLoading("Chargement de l'échantillon")
+                setData([])
                 const paramResponse = await axios.get(`/api/v1/samples/${sampleId}/params`)
                 dispatch(setCurrentSample(paramResponse.data))
                 dispatch(setCurrentDataSource(currentDatasource))
@@ -132,12 +131,19 @@ export default function SampleTable() {
                 if (e.status_code === 404) {
                     history.push("/nosample/")
                 }
-            } finally {
-                setLoading('')
             }
         })()
 
     }, [sampleId])
+
+
+    useEffect(() => {
+            if (data.length) {
+                setLoading('')
+            }
+        },
+        [sampleId]
+    )
 
 
     useEffect(() => {
@@ -193,7 +199,7 @@ export default function SampleTable() {
 
                     <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                         <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-                            {currentDatasource && loading === "" ?
+                            {data.length && loading === "" ?
                                 <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
                                     <table className="min-w-full divide-y divide-gray-200">
                                         <thead className="bg-gray-50">

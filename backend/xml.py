@@ -64,7 +64,7 @@ class MatchingConfigParser:
         pairs = {}
         for similarity in self.xml.xpath("//*/similarity"):
 
-            similarity_name = similarity.attrib["similarityName"].lower()
+            similarity_name = similarity.attrib["similarityName"]
             similarity_type = (
                 {
                     "jaroWincklerSimilarityNames": "name",

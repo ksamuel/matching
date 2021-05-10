@@ -57,14 +57,7 @@ class DBApi:
         }
 
     def sample(self, min_score, max_score, size):
-        print(
-            self.connection.execute(
-                select(func.count(self.table.c.id))
-                    .select_from(self.table)
-                    .where(self.table.c.poids.is_(None))
-            ).scalar(),
-            size,
-        )
+
         weight = (
             self.connection.execute(
                 select(func.count(self.table.c.id))
@@ -73,8 +66,6 @@ class DBApi:
             ).scalar()
             / size
         )
-
-        columns = [column(c) for c in self.inline_tables()]
 
         selection = (
             select(self.table.c.id)
@@ -93,7 +84,7 @@ class DBApi:
                 update(self.table)
                     .where(self.table.c.id.in_(selection))
                     .values({self.table.c.poids: weight})
-                    .returning(*columns)
+                    .returning(*[column(c) for c in self.inline_tables()])
             )
         )
 
@@ -134,7 +125,8 @@ class DBApi:
         )
 
         with engine.connect() as connection:
-            yield cls(connection, table, db_data, xml.pairs())
+            with connection.begin():
+                yield cls(connection, table, db_data, xml.pairs())
 
     @classmethod
     @contextmanager
@@ -153,4 +145,5 @@ class DBApi:
         )
 
         with engine.connect() as connection:
-            yield cls(connection, table, db_data, datasource["schema"])
+            with connection.begin():
+                yield cls(connection, table, db_data, datasource["schema"])

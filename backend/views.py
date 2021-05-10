@@ -141,19 +141,19 @@ def score_boundaries(request, datasource_id):
 @api_view(["POST"])
 @parser_classes([JSONParser])
 def create_sample(request, datasource_id):
-    with DBApi.db_from_cache(datasource_id) as api:
-        count = int(request.data["count"])
-        min = float(request.data["min"])
-        max = float(request.data["max"])
-        sample_id = str(uuid.uuid4())
-        try:
+    try:
+        with DBApi.db_from_cache(datasource_id) as api:
+            count = int(request.data["count"])
+            min = float(request.data["min"])
+            max = float(request.data["max"])
+            sample_id = str(uuid.uuid4())
 
             pairs = api.sample(min, max, count)
-        except InsufficientPopulationSize as e:
-            raise RequestedSampleIsTooBig(e.requested_size, e.actual_size)
+    except InsufficientPopulationSize as e:
+        raise RequestedSampleIsTooBig(e.requested_size, e.actual_size)
 
-        redis.save_sample(datasource_id, sample_id, count, min, max, pairs)
-        return Response(redis.load_sample_params(sample_id))
+    redis.save_sample(datasource_id, sample_id, count, min, max, pairs)
+    return Response(redis.load_sample_params(sample_id))
 
 
 @api_view(["PUT"])
