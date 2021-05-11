@@ -192,9 +192,10 @@ def get_sample_data(request, sample_id):
                 "similarity": f"{row[similarity_name]:.2f}",
             }
 
-            sample_table.append(table_line)
+        sample_table.append(table_line)
 
-            sample_table.sort(key=itemgetter("id"))
+        sample_table.sort(key=itemgetter("id"))
+
     return Response(sample_table)
 
 
