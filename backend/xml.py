@@ -5,9 +5,9 @@ from lxml import etree
 
 
 class MatchingConfigParser:
-    xsd = "/home/user/Work/dev_pro/depp/matching/repo/backend/matching.xsd"
-    schema = etree.XMLSchema(etree.parse(xsd))
-    xml_parser = etree.XMLParser(schema=schema)
+    # xsd = "/home/user/Work/dev_pro/depp/matching/repo/backend/matching.xsd"
+    # schema = etree.XMLSchema(etree.parse(xsd))
+    xml_parser = etree.XMLParser()  # schema=schema)
 
     def __init__(self, path):
         self.xml = etree.parse(path)  # , self.xml_parser)
