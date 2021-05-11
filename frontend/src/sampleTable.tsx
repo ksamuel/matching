@@ -7,28 +7,12 @@ import findCurrentData from "./selectors"
 
 import {setCurrentDataSource, setCurrentSample} from "./sampleSlice"
 
-import {classNames, ErrorNotification, Spinner, zip} from "./utils";
+import {classNames, ErrorNotification, Spinner} from "./utils";
 
 import axios from "axios";
 import {getDatasource} from "./api";
-import {sampleData} from ".testData"
+
 import dayjs from "dayjs";
-
-
-function StringComparison({first, second}) {
-
-    if (!second) {
-        return <span>{first}<br/>...</span>
-    }
-
-    if (!first) {
-        return <span>...<br/>{second}</span>
-    }
-
-    zip(Array.from(first), Array.from(second), fill = ' ').map((a, b) => {
-
-    })
-}
 
 
 function TripleButton({value, onChange}) {
@@ -90,6 +74,7 @@ export default function SampleTable() {
     let schema;
 
     const [loading, setLoading] = useState('')
+    const [order, setOrder] = useState('')
     const [data, setData] = useState([])
     const [errorMsg, setErrorMsg] = useState('')
 
@@ -173,12 +158,42 @@ export default function SampleTable() {
         axios.put(`/api/v1/samples/${currentSample.id}/pairs/${pair_id}/status`, {'status': value})
     }
 
+    const statusOrder = {
+        'ok': 3,
+        'nok': 2,
+        '?': 1,
+        null: 0,
+    }
+
+    useEffect(() => {
+        if (!order) {
+            return
+        }
+
+        const rank = order == "ascending" ? 1 : -1
+        data.sort((pair1, pair2) => {
+            const status1 = statusOrder[pair1.status]
+            const status2 = statusOrder[pair2.status]
+            if (status1 > status2) {
+                return rank;
+            }
+            if (status2 > status1) {
+                return -rank;
+            }
+            return 0;
+        });
+
+        setData([...data])
+
+    }, [order])
+
+
     if (currentDatasource) {
         schema = currentDatasource['schema']
     }
 
     return (<> {currentDatasource &&
-        <header className="bg-white shadow">
+        <header className="bg-white shadow  ">
             <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                 <h1 className="text-2xl  text-gray-900 truncate mb-2">{currentDatasource.name}
                 </h1>
@@ -202,7 +217,7 @@ export default function SampleTable() {
                             {data.length && loading === "" ?
                                 <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
                                     <table className="min-w-full divide-y divide-gray-200">
-                                        <thead className="bg-gray-50">
+                                        <thead className="bg-gray-50  ">
                                         <tr>
                                             {Object.keys(schema).map((field) => {
                                                 return <th key={field}
@@ -224,9 +239,20 @@ export default function SampleTable() {
                                             <th
                                                 scope="col"
                                                 rowSpan={2}
-                                                className="   border border-gray-300 w-8 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                                onClick={() => setOrder(order !== "ascending" ? 'ascending' : 'descending')}
+                                                className=" cursor-pointer  border border-gray-300 w-8 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                                             >
-                                                Status
+                                                <span className={"flex align-middle justify-center"}>Status
+                                                    {order && <svg className={classNames(
+                                                        order === "descending" ? '-rotate-90' : 'rotate-90  ',
+                                                        '  h-4 w-4 transform   text-gray-800 transition-colors ease-in-out duration-150 mx-2')}
+                                                                   viewBox="0 0 20 20"
+                                                                   aria-hidden="true"
+
+                                                    >
+                                                        <path d="M6 6L14 10L6 14V6Z" fill="currentColor"/>
+                                                    </svg>}
+                                                    </span>
                                             </th>
 
                                         </tr>

@@ -1,0 +1,91 @@
+## Install in prod
+
+Make sure you have python 3.7+ (with venv):
+
+```bash
+python3.7 -m venv env
+source env/bin/python3.7
+git clone git@github.com:ksamuel/matching.git matching
+cd matching
+pip install -r requirements.txt
+```
+
+Create a "matching" user, e.g (with admin privileges):
+
+```bash
+useradd matching
+```
+
+Create a "/etc/systemd/system/matching.service" file:
+
+```ini
+[Unit]
+Description = Matching app
+After = network.target
+
+[Service]
+PIDFile = /run/matching/matching.pid
+User = matching
+Group = matching
+WorkingDirectory = /path/to/the/project/matching
+ExecStartPre = /bin/mkdir /run/matching
+ExecStartPre = /bin/chown -R matching:matching /run/matching
+ExecStart = /path/to/the/project/env/bin/gunicorn project.wsgi -b 0.0.0.0:8000 --pid /run/matching/matching.pid --workers 3
+ExecReload = /bin/kill -s HUP $MAINPID
+ExecStop = /bin/kill -s TERM $MAINPID
+ExecStopPost = /bin/rm -rf /run/matching
+PrivateTmp = true
+Environment = "INSERJEUNES_DB_PWD=put here the database password that has been removed from the XML"
+Environment = "REDIS_URL=put here the url to connect to the redis instance"
+Environment = "DEBUG=this should be false in production"
+Environment = "SECRET_KEY=put here a randomly generated secret key used for session management"
+
+[Install]
+WantedBy = multi-user.target
+```
+
+Example values for env vars:
+
+```init
+INSERJEUNES_DB_PWD=fj789hfdsUB6FFd
+REDIS_URL=redis://127.0.0.1:6379/0
+SECRET_KEY=#2t!6-q@)!lxa@bupm%4*e5bn-1q&$rwg#+q&9o!o4mormm=-b
+REDIS_URL=redis://127.0.0.1:6379/0 SECRET_KEY="%2bz%!
+DEBUG=false
+```
+
+Use a new secret key for each prod, generate one from https://djecrety.ir/.
+
+Start the service:
+
+```bash
+sudo systemctl enable matching
+```
+
+## Setup dev
+
+Make sure you have python 3.7+ (with venv), and run the backend:
+
+```bash
+python3.7 -m venv env
+source env/bin/python3.7
+git clone git@github.com:ksamuel/matching.git matching
+cd matching
+pip install -r requirements.txt
+pip install -r dev-requirements.txt
+python manage.py runserver
+```
+
+Make sure you have nodejs 12+, and in another terminal run the frontend:
+
+```bash
+cd frontend
+npm install --include=dev
+npm run dev
+```
+
+To build the project:
+
+```bash
+npm run build # outputs in frontend/dist
+```

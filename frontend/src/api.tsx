@@ -16,6 +16,3 @@ export const createSample = (uid, count, minScore, maxScore) => {
     return axios.post(`/api/v1/datasources/${uid}/samples/`, {count: count, min: minScore, max: maxScore})
 }
 
-export const getSample = (uid) => {
-    return axios.g(`/api/v1/sample/${uid}/data/`)
-}

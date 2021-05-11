@@ -54,7 +54,7 @@ export default function MenuEntry({datasource, currentDatasource, currentSample}
                             <li><span
                                 className={"font-black text-gray-800"}>Date:</span> {dayjs(sample.date).format('HH:mm:ss DD/MM/YYYY')}
                             </li>
-                            <li className="text-xs text-gray-400">Expire: {dayjs(sample.expireDate).fromNow()} < /li>
+                            <li className="text-xs text-gray-400">Expire: {dayjs(sample.expireDate).fromNow()} </li>
                         </ul>
                     </Link>
                 ))}

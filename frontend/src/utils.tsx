@@ -8,11 +8,6 @@ export function classNames(...classes) {
 }
 
 
-export function* zip(arr1, arr2, fill = '') {
-    while (arr1[i] || arr2[i]) {
-        yield [arr1[i] || fill, arr2[i++] || fill]
-    }
-}
 
 export const CONTROL_KEYS = [
     'Backspace',
@@ -50,10 +45,8 @@ export function Spinner({msg}) {
         <h1 className="text-center my-20 text-4xl font-extrabold text-gray-600 sm:text-5xl sm:tracking-tight lg:text-6xl">
             {msg}
         </h1>
-        <div
-            className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-64 w-64"></div>
-
-    </div>;
+        <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-64 w-64"></div>
+    </div>
 }
 
 export function ErrorNotification({msg}) {
