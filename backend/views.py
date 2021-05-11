@@ -25,26 +25,13 @@ from backend.exceptions import (
     InsufficientPopulationSize,
 )
 from backend.xml import MatchingConfigParser
+from backend.utils import default_formatter, PAIRS_FORMATTERS
 
 log = logging.getLogger(__name__)
 
 
 class UploadFileForm(forms.Form):
     xml = forms.FileField()
-
-
-def common_chars(first, second):
-    for char in ndiff(first, second):
-        match = char[0]
-        if match != "+":
-            yield match == " "
-
-
-def common_chars_pair(first, second):
-    return {
-        first: list(common_chars(first, second)),
-        second: list(common_chars(second, first)),
-    }
 
 
 @csrf_exempt
@@ -194,102 +181,23 @@ def get_sample_data(request, sample_id):
                 [name for name in names] for _, names in names.items()
             ]
 
-            if field_type == "date":
-                sep = "/"
-                formatter = lambda x: str(x or "").zfill(2)
-            else:
-                sep = " "
-                formatter = lambda x: str(x or "").title()
+            formatter = PAIRS_FORMATTERS.get(field_type, default_formatter)
+            fields1_values = (row[field] for field in fields1_names)
+            fields2_values = (row[field] for field in fields2_names)
+            value1, value2 = formatter(fields1_values, fields2_values)
 
             pairs[similarity_name] = {
-                "value1": sep.join(formatter(row[name]) for name in fields1_names),
-                "value2": sep.join(formatter(row[name]) for name in fields2_names),
+                "value1": value1,
+                "value2": value2,
                 "similarity": f"{row[similarity_name]:.2f}",
             }
 
-        sample_table.append(table_line)
+            sample_table.append(table_line)
 
-    sample_table.sort(key=itemgetter("id"))
+            sample_table.sort(key=itemgetter("id"))
     return Response(sample_table)
 
 
 @api_view()
 def get_sample_params(request, sample_id):
     return Response(redis.load_sample_params(sample_id))
-
-
-@api_view()
-def sample(request, sample_id):
-    return Response(
-        [
-            {
-                "id": "1",
-                "pairs": [
-                    {"name": "similarite_nom", "values": ["TIENE", "TIENE"]},
-                    {"name": "similarite_prenom", "values": ["ANDREA", "LEANDRE"]},
-                    {"name": "similarite_dateNaissance", "values": ["24/12/2002"]},
-                    {
-                        "name": "similarite_codeCommuneNaissance",
-                        "values": ["99326", "91228"],
-                    },
-                    {"name": "similarite_sexe", "values": ["1", "0"]},
-                ],
-                "score": 0.5359286694101509,
-                "status": None,
-            },
-            {
-                "id": "2",
-                "pairs": [
-                    {"name": "similarite_nom", "values": ["LONGCHE", "LONGCHAMP"]},
-                    {"name": "similarite_prenom", "values": ["RAPHAEL", "ISMAEL"]},
-                    {
-                        "name": "similarite_dateNaissance",
-                        "values": ["24/12/2002", "24/12/2000"],
-                    },
-                    {
-                        "name": "similarite_codeCommuneNaissance",
-                        "values": ["33318", "06085"],
-                    },
-                    {"name": "similarite_sexe", "values": ["1", "1"]},
-                ],
-                "score": 0,
-                "status": "nok",
-            },
-            {
-                "id": "3",
-                "pairs": [
-                    {"name": "similarite_nom", "values": ["LONGCHE", "LONGCHE"]},
-                    {"name": "similarite_prenom", "values": ["MELVIN", "MELVIN"]},
-                    {
-                        "name": "similarite_dateNaissance",
-                        "values": ["24/12/2002", "24/12/2002"],
-                    },
-                    {
-                        "name": "similarite_codeCommuneNaissance",
-                        "values": ["33318", "33318"],
-                    },
-                    {"name": "similarite_sexe", "values": ["0", "0"]},
-                ],
-                "score": 3.2,
-                "status": "ok",
-            },
-            {
-                "id": "4",
-                "pairs": [
-                    {"name": "similarite_nom", "values": ["CAMPET", "CAMPET"]},
-                    {"name": "similarite_prenom", "values": ["ALEX", "ALEX"]},
-                    {
-                        "name": "similarite_dateNaissance",
-                        "values": ["23/12/2002", "24/12/2002"],
-                    },
-                    {
-                        "name": "similarite_codeCommuneNaissance",
-                        "values": ["33318", "33318"],
-                    },
-                    {"name": "similarite_sexe", "values": ["0", "0"]},
-                ],
-                "score": 3.1,
-                "status": "?",
-            },
-        ]
-    )

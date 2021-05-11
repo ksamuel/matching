@@ -18,7 +18,6 @@ from django.urls import path, re_path
 
 from backend.views import (
     upload_file,
-    sample,
     datasource_list,
     score_boundaries,
     datasource,
@@ -30,7 +29,6 @@ from backend.views import (
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/v1/sample/<int:sample_id>/", sample),
     re_path(
         "api/v1/samples/(?P<sample_id>[0-9a-f-]{36})/pairs/(?P<pair_id>[0-9A-Z]+)/status",
         update_pair_status,

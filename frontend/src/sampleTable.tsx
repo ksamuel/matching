@@ -262,8 +262,10 @@ export default function SampleTable() {
                                                     const [name, {value1, value2, similarity}] = pair
                                                     return <Fragment key={name}>
                                                         <td
-                                                            className={classNames(schema[name].type !== "name" ? "text-center" : "", "px-2 border border-gray-300 w-8 whitespace-nowrap text-sm text-gray-500")}>{value1}{value2 ?
-                                                            <br/> : ''}{value2}</td>
+                                                            className={classNames(schema[name].type !== "name" ? "text-center" : "",
+                                                                "px-2 border border-gray-300 w-8 whitespace-nowrap text-sm text-gray-500")}
+                                                            dangerouslySetInnerHTML={{__html: value1 + (value2 ? "<br/>" : '') + value2}}
+                                                        ></td>
                                                         <td className="  text-center   whitespace-nowrap border border-gray-300   text-sm text-gray-500 ">{similarity}</td>
                                                     </Fragment>
                                                 }))}
