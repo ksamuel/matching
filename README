@@ -4,7 +4,7 @@ Make sure you have python 3.7+ (with venv):
 
 ```bash
 python3.7 -m venv env
-source env/bin/python3.7
+source env/bin/activate
 git clone git@github.com:ksamuel/matching.git matching
 cd matching
 pip install -r requirements.txt
@@ -16,33 +16,18 @@ Create a "matching" user, e.g (with admin privileges):
 useradd matching
 ```
 
-Create a "/etc/systemd/system/matching.service" file:
+Make sure your init system runs this:
 
-```ini
-[Unit]
-Description = Matching app
-After = network.target
-
-[Service]
-PIDFile = /run/matching/matching.pid
-User = matching
-Group = matching
-WorkingDirectory = /path/to/the/project/matching
-ExecStartPre = /bin/mkdir /run/matching
-ExecStartPre = /bin/chown -R matching:matching /run/matching
-ExecStart = /path/to/the/project/env/bin/gunicorn project.wsgi -b 0.0.0.0:8000 --pid /run/matching/matching.pid --workers 3
-ExecReload = /bin/kill -s HUP $MAINPID
-ExecStop = /bin/kill -s TERM $MAINPID
-ExecStopPost = /bin/rm -rf /run/matching
-PrivateTmp = true
-Environment = "INSERJEUNES_DB_PWD=put here the database password that has been removed from the XML"
-Environment = "REDIS_URL=put here the url to connect to the redis instance"
-Environment = "DEBUG=this should be false in production"
-Environment = "SECRET_KEY=put here a randomly generated secret key used for session management"
-
-[Install]
-WantedBy = multi-user.target
 ```
+/path/to/the/project/env/bin/gunicorn project.wsgi -b 0.0.0.0:8000  --workers 4
+```
+
+At boot. It should also pass the following environment variables:
+
+- INSERJEUNES_DB_PWD: put here the database password that has been removed from the XML
+- REDIS_URL: put here the url to connect to the redis instance
+- DEBUG: this should be false in production
+- SECRET_KEY: put here a randomly generated secret key used for session management
 
 Example values for env vars:
 
@@ -54,13 +39,12 @@ REDIS_URL=redis://127.0.0.1:6379/0 SECRET_KEY="%2bz%!
 DEBUG=false
 ```
 
-Use a new secret key for each prod, generate one from https://djecrety.ir/.
+Use a new secret key for each prod, generate one from https://djecrety.ir/ but remove any "%" since systemd interprets
+them.
 
-Start the service:
+Start the service, and ensure your web server is doing a proxy pass to `0.0.0.0:8000`, and set the root directory to "
+/path/to/the/project/frontend/dist".
 
-```bash
-sudo systemctl enable matching
-```
 
 ## Setup dev
 
@@ -68,7 +52,7 @@ Make sure you have python 3.7+ (with venv), and run the backend:
 
 ```bash
 python3.7 -m venv env
-source env/bin/python3.7
+source env/bin/activate
 git clone git@github.com:ksamuel/matching.git matching
 cd matching
 pip install -r requirements.txt
