@@ -21,15 +21,14 @@ At boot. It should also pass the following environment variables:
 - REDIS_URL: put here the url to connect to the redis instance
 - DEBUG: this should be false in production
 - SECRET_KEY: put here a randomly generated secret key used for session management
-
-Example values for env vars:
+- ALLOWED_HOST: the IP of the server or the domain name to access the website Example values for env vars:
 
 ```init
 INSERJEUNES_DB_PWD=fj789hfdsUB6FFd
 REDIS_URL=redis://127.0.0.1:6379/0
 SECRET_KEY=#2t!6-q@)!lxa@bupm%4*e5bn-1q&$rwg#+q&9o!o4mormm=-b
-REDIS_URL=redis://127.0.0.1:6379/0 SECRET_KEY="%2bz%!
 DEBUG=false
+ALLOWED_HOST=183.12.12.34
 ```
 
 Use a new secret key for each prod, generate one from https://djecrety.ir/ but remove any "%" since systemd interprets
@@ -46,7 +45,7 @@ Make sure you have python 3.6+ and peotry, then run the backend:
 ```bash
 git clone https://github.com/ksamuel/matching.git matching
 cd matching
-poetry install 
+poetry install
 poetry run manage.py runserver
 ```
 
