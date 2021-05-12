@@ -1,22 +1,15 @@
 ## Install in prod
 
-Make sure you have python 3.7+ (with venv):
+Make sure you have python 3.6+ and poetry installed, then:
 
 ```bash
-python3.7 -m venv env
-source env/bin/activate
-git clone git@github.com:ksamuel/matching.git matching
+git clone https://github.com/ksamuel/matching.git matching
 cd matching
-pip install -r requirements.txt
+poetry install --no-dev
 ```
 
-Create a "matching" user, e.g (with admin privileges):
 
-```bash
-useradd matching
-```
-
-Make sure your init system runs this:
+Then ensure your init system runs this:
 
 ```
 /path/to/the/project/env/bin/gunicorn project.wsgi -b 0.0.0.0:8000  --workers 4
@@ -48,16 +41,13 @@ Start the service, and ensure your web server is doing a proxy pass to `0.0.0.0:
 
 ## Setup dev
 
-Make sure you have python 3.7+ (with venv), and run the backend:
+Make sure you have python 3.6+ and peotry, then run the backend:
 
 ```bash
-python3.7 -m venv env
-source env/bin/activate
-git clone git@github.com:ksamuel/matching.git matching
+git clone https://github.com/ksamuel/matching.git matching
 cd matching
-pip install -r requirements.txt
-pip install -r dev-requirements.txt
-python manage.py runserver
+poetry install 
+poetry run manage.py runserver
 ```
 
 Make sure you have nodejs 12+, and in another terminal run the frontend:
