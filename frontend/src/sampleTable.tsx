@@ -156,6 +156,12 @@ export default function SampleTable() {
 
     const updatePairStatus = (value, pair_id) => {
         axios.put(`/api/v1/samples/${currentSample.id}/pairs/${pair_id}/status`, {'status': value})
+        setData(data.map((pair) => {
+            if (pair.id === pair_id) {
+                return {...pair, status: value}
+            }
+            return pair
+        }))
     }
 
     const statusOrder = {
