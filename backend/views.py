@@ -7,6 +7,7 @@ from django import forms
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from lxml.etree import XMLSyntaxError
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
@@ -40,7 +41,12 @@ def upload_file(request):
     form = UploadFileForm(request.POST, request.FILES)
     if form.is_valid():
 
-        xml = MatchingConfigParser(request.FILES["xml"])
+        try:
+            xml = MatchingConfigParser(request.FILES["xml"])
+        except XMLSyntaxError as e:
+            return HttpResponse(
+                f"Le XML contient une erreur de syntaxe ligne {e.lineno}.", status=400
+            )
 
         try:
             with DBApi.db_from_parser(xml) as api:
@@ -116,6 +122,8 @@ def datasource_list(request):
 @api_view()
 def datasource(request, datasource_id):
     datasource = redis.load_datasource(datasource_id)
+    if not datasource:
+        return HttpResponse(f"Cette source de données n'existe pas", status=404)
     datasource.pop("db_data")
     return Response({"id": datasource_id, **datasource})
 
@@ -160,7 +168,15 @@ def update_pair_status(request, sample_id, pair_id):
 @api_view()
 def get_sample_data(request, sample_id):
     sample = redis.load_sample(sample_id)
+
+    if not sample:
+        return HttpResponse(f"Cet échantillon n'existe pas", status=404)
+
     datasource = redis.load_sample_params(sample_id)["datasource"]
+
+    if not datasource:
+        return HttpResponse(f"Cet échantillon n'existe pas", status=404)
+
     schema = redis.load_datasource(datasource)["schema"]
 
     sample_table = []
@@ -184,6 +200,7 @@ def get_sample_data(request, sample_id):
             formatter = PAIRS_FORMATTERS.get(field_type, default_formatter)
             fields1_values = (row[field] for field in fields1_names)
             fields2_values = (row[field] for field in fields2_names)
+
             value1, value2 = formatter(fields1_values, fields2_values)
 
             pairs[similarity_name] = {

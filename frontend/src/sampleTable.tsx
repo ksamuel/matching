@@ -107,15 +107,17 @@ export default function SampleTable() {
 
             } catch (e) {
 
+                if (e.status_code === 404) {
+                    history.push("/nosample/")
+                }
+
                 if (e.response.data.detail) {
                     setErrorMsg(e.response.data.detail)
                 } else {
                     setErrorMsg("Une erreur inconnue est survenue")
                     console.error(e)
                 }
-                if (e.status_code === 404) {
-                    history.push("/nosample/")
-                }
+
             }
         })()
 
@@ -292,9 +294,10 @@ export default function SampleTable() {
                                                 {(Object.entries(pairs).map((pair) => {
 
                                                     const [name, {value1, value2, similarity}] = pair
+                                                    const type = schema[name].type
                                                     return <Fragment key={name}>
                                                         <td
-                                                            className={classNames(schema[name].type !== "name" ? "text-center" : "",
+                                                            className={classNames(type === "gender" || type === "date" ? "text-center" : "",
                                                                 "px-2 border border-gray-300 w-8 whitespace-nowrap text-sm text-gray-500")}
                                                             dangerouslySetInnerHTML={{__html: value1 + (value2 ? "<br/>" : '') + value2}}
                                                         ></td>

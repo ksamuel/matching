@@ -70,9 +70,13 @@ class MatchingConfigParser:
                     "jaroWincklerSimilarityNames": "name",
                     "similarityBirthDate": "date",
                     "levenshteinSimilarityBirthPlaceCOG": "city",
+                    "binary": "gender",
                 }
             ).get(similarity.attrib["similarityMethod"], "verbatim")
             cols = {}
+
+            sim = similarity.attrib["similarityMethod"]
+            print(sim)
 
             schema = pairs[similarity_name] = {"cols": cols, "type": similarity_type}
 
