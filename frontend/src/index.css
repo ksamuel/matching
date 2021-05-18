@@ -47,3 +47,18 @@ input[type=number] {
     transform: rotate(360deg);
   }
 }
+
+/* Sticky table header */
+
+.table-container {
+  overflow: auto;
+  height: 85vh;
+}
+
+.table-container thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+

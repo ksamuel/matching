@@ -223,15 +223,16 @@ export default function SampleTable() {
                     <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                         <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
                             {data.length && loading === "" ?
-                                <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                                    <table className="min-w-full divide-y divide-gray-200">
-                                        <thead className="bg-gray-50  ">
+                                <div
+                                    className="table-container shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                                    <table className="min-w-full divide-y divide-gray-200  ">
+                                        <thead className="bg-gray-200  ">
                                         <tr>
                                             {Object.keys(schema).map((field) => {
                                                 return <th key={field}
                                                            scope="col"
                                                            colSpan={2}
-                                                           className="  py-3 border border-gray-300 w-8 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                                           className=" px-2 py-3 border border-gray-300 w-8 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                                                 >
                                                     {field}
                                                 </th>
@@ -239,14 +240,14 @@ export default function SampleTable() {
 
                                             <th
                                                 scope="col"
-                                                rowSpan={2}
+
                                                 className="   border border-gray-300 w-8 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                                             >
                                                 Score
                                             </th>
                                             <th
                                                 scope="col"
-                                                rowSpan={2}
+
                                                 onClick={() => setOrder(order !== "ascending" ? 'ascending' : 'descending')}
                                                 className=" cursor-pointer  border border-gray-300 w-8 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                                             >
@@ -264,25 +265,7 @@ export default function SampleTable() {
                                             </th>
 
                                         </tr>
-                                        <tr>
 
-                                            {Object.keys(currentDatasource['schema']).map((field) => {
-                                                return (<Fragment key={field}>
-                                                        <th
-                                                            scope="col"
-                                                            className="px-6 py-2 border border-gray-300 w-8 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                                        > Paire
-                                                        </th>
-                                                        <th
-                                                            scope="col"
-                                                            className="px-6 py-2 border border-gray-300 w-8 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                                        >
-                                                            Similarité
-                                                        </th>
-                                                    </Fragment>
-                                                )
-                                            })}
-                                        </tr>
 
                                         </thead>
                                         <tbody>
@@ -301,7 +284,7 @@ export default function SampleTable() {
                                                                 "px-2 border border-gray-300 w-8 whitespace-nowrap text-sm text-gray-500")}
                                                             dangerouslySetInnerHTML={{__html: value1 + (value2 ? "<br/>" : '') + value2}}
                                                         ></td>
-                                                        <td className="  text-center   whitespace-nowrap border border-gray-300   text-sm text-gray-500 ">{similarity}</td>
+                                                        <td className=" px-2 w-4 text-center   whitespace-nowrap border border-gray-300   text-sm text-gray-500 ">{similarity}</td>
                                                     </Fragment>
                                                 }))}
 

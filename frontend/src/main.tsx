@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import './index.css'
-import App from './App'
+
 import {
     BrowserRouter as Router,
 } from "react-router-dom";
@@ -11,7 +11,10 @@ import {Provider} from 'react-redux'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import updateLocale from 'dayjs/plugin/updateLocale'
 
+import Layout from "./layout"
+
 import dayjs from 'dayjs'
+
 
 import store from './store'
 
@@ -41,7 +44,9 @@ ReactDOM.render(
     <React.StrictMode>
 
         <Provider store={store}>
-            <Router><App/></Router>
+            <Router>
+                <Layout/>
+            </Router>
         </Provider>,
     </React.StrictMode>,
     document.getElementById('root')
