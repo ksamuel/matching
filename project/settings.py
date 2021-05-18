@@ -21,16 +21,20 @@ from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 PROJECT_DIR = BASE_DIR / "project"
-STATIC_ROOT = BASE_DIR / "frontend/dist/"
+FRONTEND_DIR = BASE_DIR / "frontend/dist/"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 load_dotenv()
 
-d12f = django12factor.factorise(custom_settings=("INSERJEUNES_DB_PWD", "REDIS_URL"))
+d12f = django12factor.factorise(
+    custom_settings=("INSERJEUNES_DB_PWD", "REDIS_URL", "BASE_URL")
+)
 
 SECRET_KEY = d12f["SECRET_KEY"]
+
+BASE_URL = d12f["BASE_URL"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = d12f["DEBUG"]
@@ -42,7 +46,7 @@ INSERJEUNES_DB_PWD = d12f["INSERJEUNES_DB_PWD"]
 # Application definition
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
+    # "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -107,6 +111,16 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [FRONTEND_DIR],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            # ... some options here ...
+        },
+    }
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
@@ -121,8 +135,10 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
-STATIC_URL = "/static/"
+STATIC_URL = "/assets/"
+STATIC_URL = "/media/"
+
+STATICFILES_DIRS = [FRONTEND_DIR / "assets"]

@@ -22,13 +22,16 @@ At boot. It should also pass the following environment variables:
 - DEBUG: this should be false in production
 - SECRET_KEY: put here a randomly generated secret key used for session management
 - ALLOWED_HOST: the IP of the server or the domain name to access the website Example values for env vars:
-
+- BASE_URL: the absolute url root to serve the site with. This must match you apache/nginx config and well set the HTML
+  base tag.
+  
 ```init
 INSERJEUNES_DB_PWD=fj789hfdsUB6FFd
 REDIS_URL=redis://127.0.0.1:6379/0
 SECRET_KEY=#2t!6-q@)!lxa@bupm%4*e5bn-1q&$rwg#+q&9o!o4mormm=-b
 DEBUG=false
 ALLOWED_HOST=183.12.12.34
+BASE_URL=http://183.12.12.34:8989/matching/
 ```
 
 Use a new secret key for each prod, generate one from https://djecrety.ir/ but remove any "%" since systemd interprets
