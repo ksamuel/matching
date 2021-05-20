@@ -142,3 +142,25 @@ STATIC_URL = "/assets/"
 STATIC_URL = "/media/"
 
 STATICFILES_DIRS = [FRONTEND_DIR / "assets"]
+
+LOG_LEVEL = os.environ.get('LOG_LEVEL', "WARNING").upper()
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level":LOG_LEVEL,
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+    },
+}

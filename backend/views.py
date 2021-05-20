@@ -28,7 +28,7 @@ from backend.exceptions import (
 from backend.xml import MatchingConfigParser
 from backend.utils import default_formatter, PAIRS_FORMATTERS
 
-log = logging.getLogger(__name__)
+log = logging.getLogger("django")
 
 
 class UploadFileForm(forms.Form):
