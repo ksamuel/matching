@@ -30,28 +30,45 @@ from backend.views import (
     update_pair_status,
 )
 
-urlpatterns = [
-    # path("admin/", admin.site.urls),
-    re_path(
-        "api/v1/samples/(?P<sample_id>[0-9a-f-]{36})/pairs/(?P<pair_id>[0-9A-Z]+)/status",
-        update_pair_status,
-    ),
-    re_path("api/v1/samples/(?P<sample_id>[0-9a-f-]{36})/data/", get_sample_data),
-    re_path("api/v1/samples/(?P<sample_id>[0-9a-f-]{36})/params/", get_sample_params),
-    re_path(
-        "api/v1/datasources/(?P<datasource_id>[0-9a-f]{64})/scoreboundaries/",
-        score_boundaries,
-    ),
-    re_path(
-        "api/v1/datasources/(?P<datasource_id>[0-9a-f]{64})/samples/", create_sample
-    ),
-    re_path("api/v1/datasources/(?P<datasource_id>[0-9a-f]{64})/", datasource),
-    path("api/v1/datasources/", datasource_list),
-    path("upload_file/", upload_file),
-    path(
-        "",
-        TemplateView.as_view(
-            template_name="index.html", extra_context={"BASE_URL": settings.BASE_URL}
+frontend_urls = [
+    "",
+    "datasources/<datasourceId>/samples/<sampleId>/",
+    "datasources/<datasourceId>/",
+    "nodatasource/",
+    "nosample/",
+]
+
+urlpatterns = (
+    [
+        # path("admin/", admin.site.urls),
+        re_path(
+            "api/v1/samples/(?P<sample_id>[0-9a-f-]{36})/pairs/(?P<pair_id>[0-9A-Z]+)/status",
+            update_pair_status,
         ),
-    ),
-] + static("/assets/", document_root=settings.FRONTEND_DIR / "assets")
+        re_path("api/v1/samples/(?P<sample_id>[0-9a-f-]{36})/data/", get_sample_data),
+        re_path(
+            "api/v1/samples/(?P<sample_id>[0-9a-f-]{36})/params/", get_sample_params
+        ),
+        re_path(
+            "api/v1/datasources/(?P<datasource_id>[0-9a-f]{64})/scoreboundaries/",
+            score_boundaries,
+        ),
+        re_path(
+            "api/v1/datasources/(?P<datasource_id>[0-9a-f]{64})/samples/", create_sample
+        ),
+        re_path("api/v1/datasources/(?P<datasource_id>[0-9a-f]{64})/", datasource),
+        path("api/v1/datasources/", datasource_list),
+        path("upload_file/", upload_file),
+    ]
+    + static("/assets/", document_root=settings.FRONTEND_DIR / "assets")
+    + [
+        path(
+            url,
+            TemplateView.as_view(
+                template_name="index.html",
+                extra_context={"BASE_URL": settings.BASE_URL},
+            ),
+        )
+        for url in frontend_urls
+    ]
+)
