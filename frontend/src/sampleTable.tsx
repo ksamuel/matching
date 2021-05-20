@@ -1,21 +1,21 @@
-import React, {useEffect, useState, Fragment} from "react"
-import {useHistory, useParams} from "react-router-dom"
-import {useDispatch} from "react-redux";
+import React, { useEffect, useState, Fragment } from "react"
+import { useHistory, useParams } from "react-router-dom"
+import { useDispatch } from "react-redux";
 
 
 import findCurrentData from "./selectors"
 
-import {setCurrentDataSource, setCurrentSample} from "./sampleSlice"
+import { setCurrentDataSource, setCurrentSample } from "./sampleSlice"
 
-import {classNames, ErrorNotification, Spinner} from "./utils";
+import { classNames, ErrorNotification, Spinner } from "./utils";
 
 import axios from "axios";
-import {getDatasource} from "./api";
+import { getDatasource } from "./api";
 
 import dayjs from "dayjs";
 
 
-function TripleButton({value, onChange}) {
+function TripleButton({ value, onChange }) {
 
     let [status, setStatus] = useState(value)
 
@@ -28,38 +28,38 @@ function TripleButton({value, onChange}) {
 
     return (
         <span className="relative z-0 inline-flex shadow-sm rounded-md">
-      <button
-          onClick={onClick("ok")}
-          type="button"
-          className={classNames(status === "ok" ? "bg-green-200" : "hover:bg-gray-200",
-              "relative inline-flex items-center px-4 py-2",
-              "rounded-l-md border border-gray-300 bg-white border-gray-300",
-              "text-sm font-medium text-gray-700  focus:z-10",
-              "focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500")}
-      >
-        OK
+            <button
+                onClick={onClick("ok")}
+                type="button"
+                className={classNames(status === "ok" ? "bg-green-200" : "hover:bg-gray-200",
+                    "relative inline-flex items-center px-4 py-2",
+                    "rounded-l-md border border-gray-300 bg-white border-gray-300",
+                    "text-sm font-medium text-gray-700  focus:z-10",
+                    "focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500")}
+            >
+                OK
       </button>
-	<button
-        onClick={onClick("nok")}
-        type="button"
-        className={classNames(status === "nok" ? "bg-red-200" : "hover:bg-gray-200",
-            "-ml-px relative inline-flex items-center px-4 py-2 border border-gray-300",
-            "bg-white text-sm font-medium text-gray-700  focus:z-10",
-            "focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500")}
-    >
-		NOK
+            <button
+                onClick={onClick("nok")}
+                type="button"
+                className={classNames(status === "nok" ? "bg-red-200" : "hover:bg-gray-200",
+                    "-ml-px relative inline-flex items-center px-4 py-2 border border-gray-300",
+                    "bg-white text-sm font-medium text-gray-700  focus:z-10",
+                    "focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500")}
+            >
+                NOK
 	</button>
-	<button
-        onClick={onClick("?")}
-        type="button"
-        className={classNames(status === "?" ? "bg-yellow-200" : "hover:bg-gray-200",
-            "-ml-px relative inline-flex items-center px-4 py-2 rounded-r-md border",
-            "border-gray-300 bg-white text-sm font-medium text-gray-700  focus:z-10",
-            "focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500")}
-    >
-		?
+            <button
+                onClick={onClick("?")}
+                type="button"
+                className={classNames(status === "?" ? "bg-yellow-200" : "hover:bg-gray-200",
+                    "-ml-px relative inline-flex items-center px-4 py-2 rounded-r-md border",
+                    "border-gray-300 bg-white text-sm font-medium text-gray-700  focus:z-10",
+                    "focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500")}
+            >
+                ?
 	</button>
-</span>
+        </span>
     )
 
 }
@@ -69,8 +69,8 @@ export default function SampleTable() {
     const history = useHistory()
     const dispatch = useDispatch()
 
-    const {datasourceId, sampleId} = useParams()
-    const {currentDatasource, currentSample} = findCurrentData({datasourceId, sampleId})
+    const { datasourceId, sampleId } = useParams()
+    const { currentDatasource, currentSample } = findCurrentData({ datasourceId, sampleId })
     let schema;
 
     const [loading, setLoading] = useState('')
@@ -125,10 +125,10 @@ export default function SampleTable() {
 
 
     useEffect(() => {
-            if (data.length) {
-                setLoading('')
-            }
-        },
+        if (data.length) {
+            setLoading('')
+        }
+    },
         [sampleId]
     )
 
@@ -140,15 +140,16 @@ export default function SampleTable() {
                 const dataResponse = await axios.get(`/api/v1/samples/${sampleId}/data`)
                 setData(dataResponse.data)
             } catch (e) {
+                if (e.status_code === 404) {
+                    history.push("/nosample/")
+                }
                 if (e.response.data.detail) {
                     setErrorMsg(e.response.data.detail)
                 } else {
                     setErrorMsg("Une erreur inconnue est survenue")
                     console.error(e)
                 }
-                if (e.status_code === 404) {
-                    history.push("/nosample/")
-                }
+
             } finally {
                 setLoading('')
             }
@@ -157,10 +158,10 @@ export default function SampleTable() {
     }, [sampleId])
 
     const updatePairStatus = (value, pair_id) => {
-        axios.put(`/api/v1/samples/${currentSample.id}/pairs/${pair_id}/status`, {'status': value})
+        axios.put(`/api/v1/samples/${currentSample.id}/pairs/${pair_id}/status`, { 'status': value })
         setData(data.map((pair) => {
             if (pair.id === pair_id) {
-                return {...pair, status: value}
+                return { ...pair, status: value }
             }
             return pair
         }))
@@ -217,22 +218,22 @@ export default function SampleTable() {
             </div>
 
         </header>}
-            <main>
-                <div className="flex flex-col">
+        <main>
+            <div className="flex flex-col">
 
-                    <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                        <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-                            {data.length && loading === "" ?
-                                <div
-                                    className="table-container shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                                    <table className="min-w-full divide-y divide-gray-200  ">
-                                        <thead className="bg-gray-200  ">
+                <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                    <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                        {data.length && loading === "" ?
+                            <div
+                                className="table-container shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                                <table className="min-w-full divide-y divide-gray-200  ">
+                                    <thead className="bg-gray-200  ">
                                         <tr>
                                             {Object.keys(schema).map((field) => {
                                                 return <th key={field}
-                                                           scope="col"
-                                                           colSpan={2}
-                                                           className=" px-2 py-3 border border-gray-300 w-8 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                                    scope="col"
+                                                    colSpan={2}
+                                                    className=" px-2 py-3 border border-gray-300 w-8 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                                                 >
                                                     {field}
                                                 </th>
@@ -253,36 +254,36 @@ export default function SampleTable() {
                                             >
                                                 <span className={"flex align-middle justify-center"}>Status
                                                     {order && <svg className={classNames(
-                                                        order === "descending" ? '-rotate-90' : 'rotate-90  ',
-                                                        '  h-4 w-4 transform   text-gray-800 transition-colors ease-in-out duration-150 mx-2')}
-                                                                   viewBox="0 0 20 20"
-                                                                   aria-hidden="true"
+                                                    order === "descending" ? '-rotate-90' : 'rotate-90  ',
+                                                    '  h-4 w-4 transform   text-gray-800 transition-colors ease-in-out duration-150 mx-2')}
+                                                        viewBox="0 0 20 20"
+                                                        aria-hidden="true"
 
                                                     >
-                                                        <path d="M6 6L14 10L6 14V6Z" fill="currentColor"/>
+                                                        <path d="M6 6L14 10L6 14V6Z" fill="currentColor" />
                                                     </svg>}
-                                                    </span>
+                                                </span>
                                             </th>
 
                                         </tr>
 
 
-                                        </thead>
-                                        <tbody>
-                                        {data.map(({pairs, score, status, id}, matchIdx) => {
+                                    </thead>
+                                    <tbody>
+                                        {data.map(({ pairs, score, status, id }, matchIdx) => {
 
                                             return <tr key={id}
-                                                       className={matchIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                                                className={matchIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
 
                                                 {(Object.entries(pairs).map((pair) => {
 
-                                                    const [name, {value1, value2, similarity}] = pair
+                                                    const [name, { value1, value2, similarity }] = pair
                                                     const type = schema[name].type
                                                     return <Fragment key={name}>
                                                         <td
                                                             className={classNames(type === "gender" || type === "date" ? "text-center" : "",
                                                                 "px-2 border border-gray-300 w-8 whitespace-nowrap text-sm text-gray-500")}
-                                                            dangerouslySetInnerHTML={{__html: value1 + (value2 ? "<br/>" : '') + value2}}
+                                                            dangerouslySetInnerHTML={{ __html: value1 + (value2 ? "<br/>" : '') + value2 }}
                                                         ></td>
                                                         <td className=" px-2 w-4 text-center   whitespace-nowrap border border-gray-300   text-sm text-gray-500 ">{similarity}</td>
                                                     </Fragment>
@@ -291,20 +292,20 @@ export default function SampleTable() {
                                                 <td className="px-4 py-4 whitespace-nowrap text-center border border-gray-300 w-8 font-medium text-sm text-gray-500">{score}</td>
                                                 <td className="px-2 py-4 whitespace-nowrap text-center text-sm border border-gray-300   font-medium">
                                                     <TripleButton value={status}
-                                                                  onChange={(value) => updatePairStatus(value, id)}/>
+                                                        onChange={(value) => updatePairStatus(value, id)} />
                                                 </td>
                                             </tr>
                                         })}
-                                        </tbody>
-                                    </table>
-                                </div> : <Spinner msg={loading}/>}
-                        </div>
+                                    </tbody>
+                                </table>
+                            </div> : <Spinner msg={loading} />}
                     </div>
-                    {
-                        errorMsg && <ErrorNotification msg={errorMsg}/>
-                    }
                 </div>
-            </main>
-        </>
+                {
+                    errorMsg && <ErrorNotification msg={errorMsg} />
+                }
+            </div>
+        </main>
+    </>
     )
 }

@@ -13,20 +13,10 @@ class MatchingConfigParser:
         self.xml = etree.parse(path)  # , self.xml_parser)
 
     def db_uri(self):
-        port, netloc = self.xml.xpath(
-            "//*/databaseParameter[1]/serverParameter/@*[name()='port' or name()='server']"
-        )
-        password, user = self.xml.xpath(
-            "//*/databaseParameter[1]/userParameter/@*[name()='password' or name()='user']"
-        )
-        dbname, schema = self.xml.xpath(
-            "//*/databaseParameter[1]/baseParameter/@*[name()='database' or name()='schema']"
-        )
 
-        if all(l == "*" for l in password):
-            password = settings.INSERJEUNES_DB_PWD
-
-        return f"postgresql://{user}:{password}@{netloc}:{port}/{dbname}?options=-csearch_path%3D{schema}"
+        return "postgresql://{user}:{password}@{netloc}:{port}/{dbname}?options=-csearch_path%3D{schema}".format(
+            *self.db_data()
+        )
 
     def db_data(self):
         port, netloc = self.xml.xpath(
