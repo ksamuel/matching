@@ -7,8 +7,12 @@ import { useHistory } from "react-router-dom";
 
 import { setDatasources, voidDataSource } from "./sampleSlice"
 import { getAllDatasources } from "./api";
-import { ErrorNotification } from "./utils";
+import { ErrorNotification, BASE_URL } from "./utils";
 
+const backend = axios.create({
+    baseURL: BASE_URL,
+
+});
 
 export default function Dropzone() {
     const dispatch = useDispatch()
@@ -20,7 +24,6 @@ export default function Dropzone() {
         dispatch(voidDataSource())
     }, [])
 
-
     const { getRootProps, getInputProps, open, acceptedFiles, fileRejections } = useDropzone({
         noClick: true,
         noKeyboard: true,
@@ -30,7 +33,7 @@ export default function Dropzone() {
             var formData = new FormData();
             formData.append("xml", files[0]);
 
-            axios.post('/upload_file/', formData, {
+            backend.post('/upload_file/', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -50,7 +53,6 @@ export default function Dropzone() {
             {file.path} - {file.size} bytes
         </li>
     ));
-
 
     const fileRejectionItems = fileRejections.map(({ file, errors }) => (
         <li key={file.path}>
@@ -82,14 +84,12 @@ export default function Dropzone() {
                     <div {...getRootProps({ className: 'dropzone' })}
                         className="p-4 flex flex items-center justify-center flex-col border-4 border-dashed border-gray-200rounded-lg h-96 bg-white">
 
-
                         <input {...getInputProps()} />
 
                         <h2 className="my-4 text-2xl font-extrabold tracking-tight sm:text-1xl lg:text-1xl text-gray-600 pb-5 ">
                             Glissez-déposez un fichier XML ici ou ... </h2>
 
                         <p className="">
-
 
                             <button type="button" onClick={open}
                                 className="inline-flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-2xl">
@@ -104,13 +104,11 @@ export default function Dropzone() {
 
                             </button>
 
-
                         </p>
 
                     </div>
 
                     {errorMsg && <ErrorNotification msg={errorMsg} />}
-
 
                 </div>
 

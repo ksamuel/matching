@@ -1,18 +1,24 @@
 import axios from "axios";
+import { BASE_URL } from "./utils";
+
+const backend = axios.create({
+    baseURL: BASE_URL,
+
+});
 
 export const getAllDatasources = () => {
-    return axios.get('/api/v1/datasources/')
+    return backend.get('/api/v1/datasources/')
 }
 
 export const getDatasource = (uid) => {
-    return axios.get(`/api/v1/datasources/${uid}/`)
+    return backend.get(`/api/v1/datasources/${uid}/`)
 }
 
 export const getScoreBoundaries = (uid) => {
-    return axios.get(`/api/v1/datasources/${uid}/scoreboundaries/`)
+    return backend.get(`/api/v1/datasources/${uid}/scoreboundaries/`)
 }
 
 export const createSample = (uid, count, minScore, maxScore) => {
-    return axios.post(`/api/v1/datasources/${uid}/samples/`, {count: count, min: minScore, max: maxScore})
+    return backend.post(`/api/v1/datasources/${uid}/samples/`, { count: count, min: minScore, max: maxScore })
 }
 

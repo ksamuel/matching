@@ -11,11 +11,11 @@ import { Provider } from 'react-redux'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import updateLocale from 'dayjs/plugin/updateLocale'
 
-import axios from "axios"
+
 
 import Layout from "./layout"
 
-import { BASE_URL } from "./utils"
+
 
 import dayjs from 'dayjs'
 
@@ -43,7 +43,6 @@ dayjs.updateLocale('en', {
     }
 })
 
-axios.defaults.baseURL = BASE_URL
 
 ReactDOM.render(
     <React.StrictMode>

@@ -2,8 +2,9 @@ import React, { useEffect, useState, Fragment } from "react"
 import { useHistory, useParams } from "react-router-dom"
 import { useDispatch } from "react-redux";
 
-
 import findCurrentData from "./selectors"
+
+import { BASE_URL } from "./utils"
 
 import { setCurrentDataSource, setCurrentSample } from "./sampleSlice"
 
@@ -14,6 +15,9 @@ import { getDatasource } from "./api";
 
 import dayjs from "dayjs";
 
+const backend = axios.create({
+    baseURL: BASE_URL,
+});
 
 function TripleButton({ value, onChange }) {
 
@@ -80,7 +84,6 @@ export default function SampleTable() {
 
     // TODO: datasource and datasource DATA are not the same: data[0] is currenttly the data, but it should be the aprams
 
-
     useEffect(() => {
         if (!currentDatasource) {
             setLoading("Chargement de la source de donnée")
@@ -101,7 +104,7 @@ export default function SampleTable() {
             try {
                 setLoading("Chargement de l'échantillon")
                 setData([])
-                const paramResponse = await axios.get(`/api/v1/samples/${sampleId}/params`)
+                const paramResponse = await backend.get(`/api/v1/samples/${sampleId}/params`)
                 dispatch(setCurrentSample(paramResponse.data))
                 dispatch(setCurrentDataSource(currentDatasource))
 
@@ -123,7 +126,6 @@ export default function SampleTable() {
 
     }, [sampleId])
 
-
     useEffect(() => {
         if (data.length) {
             setLoading('')
@@ -132,12 +134,11 @@ export default function SampleTable() {
         [sampleId]
     )
 
-
     useEffect(() => {
         (async () => {
             try {
                 setLoading("Chargement de l'échantillon")
-                const dataResponse = await axios.get(`/api/v1/samples/${sampleId}/data`)
+                const dataResponse = await backend.get(`/api/v1/samples/${sampleId}/data`)
                 setData(dataResponse.data)
             } catch (e) {
                 if (e.status_code === 404) {
@@ -158,7 +159,7 @@ export default function SampleTable() {
     }, [sampleId])
 
     const updatePairStatus = (value, pair_id) => {
-        axios.put(`/api/v1/samples/${currentSample.id}/pairs/${pair_id}/status`, { 'status': value })
+        backend.put(`/api/v1/samples/${currentSample.id}/pairs/${pair_id}/status`, { 'status': value })
         setData(data.map((pair) => {
             if (pair.id === pair_id) {
                 return { ...pair, status: value }
@@ -195,7 +196,6 @@ export default function SampleTable() {
         setData([...data])
 
     }, [order])
-
 
     if (currentDatasource) {
         schema = currentDatasource['schema']
@@ -266,7 +266,6 @@ export default function SampleTable() {
                                             </th>
 
                                         </tr>
-
 
                                     </thead>
                                     <tbody>
