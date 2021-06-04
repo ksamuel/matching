@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react"
 import { useHistory, useParams } from "react-router-dom"
 import { useDispatch } from "react-redux"
 
-
 import Slider from 'rc-slider'
 import 'rc-slider/assets/index.css'
 
@@ -33,7 +32,6 @@ export default function SamplingConfiguration() {
 
     useEffect(() => {
 
-
         if (!currentDatasource) {
             setLoading("Chargement de la source de donnée")
             getDatasource(datasourceId).then((response) => {
@@ -42,13 +40,12 @@ export default function SamplingConfiguration() {
 
             }).catch((error) => {
                 if (error.response.status === 404) {
-                    history.push("/nodatasource/")
+                    history.push(`${BASE_URL}/nodatasource/`)
                 }
                 setErrorMsg(error.response.data)
             }).finally(() => {
                 setLoading('')
             })
-
 
         } else {
 
@@ -65,9 +62,7 @@ export default function SamplingConfiguration() {
             })
         }
 
-
     }, [sampleId, currentDatasource, maxScore])
-
 
     const updateMinScore = (score) => {
         const cleanScore = parseFloat(score.replace(',', '.').replace(/[^\d.]/g, ''))
@@ -82,7 +77,6 @@ export default function SamplingConfiguration() {
 
     }
 
-
     const updateMaxScore = (score) => {
         const cleanScore = parseFloat(score.replace(',', '.').replace(/[^\d.]/g, ''))
 
@@ -95,7 +89,6 @@ export default function SamplingConfiguration() {
             setMaxScore(toFixedTrunc(cleanScore, 2))
         }
     }
-
 
     const updateCount = (count) => {
         const cleanCount = parseInt(count.replace(/\D/g, ''))
@@ -124,7 +117,6 @@ export default function SamplingConfiguration() {
         e.preventDefault()
     }
 
-
     const requestSample = () => {
         setErrorMsg('')
         setLoading("Echantillonnage en cours")
@@ -132,7 +124,7 @@ export default function SamplingConfiguration() {
         createSample(currentDatasource.id, count, minScore, maxScore).then((response) => {
             console.log(response.data)
             dispatch(addSampleToDataSource(response.data))
-            history.push(`{BASE_URL}datasources/${currentDatasource.id}/samples/${response.data.id}`)
+            history.push(`${BASE_URL}datasources/${currentDatasource.id}/samples/${response.data.id}`)
         }
         ).catch((error) => {
             if (error.response.data.detail) {
@@ -147,7 +139,6 @@ export default function SamplingConfiguration() {
         })
 
     }
-
 
     return <>{
         currentDatasource && loading === '' ? <>
@@ -195,7 +186,6 @@ export default function SamplingConfiguration() {
                                     </span>
                                     <span className="flex-initial ml-8 text-gray-300">300</span>
 
-
                                 </div>
 
                                 <div className="text-xl mb-4 flex items-center">
@@ -213,7 +203,6 @@ export default function SamplingConfiguration() {
                                     </span>
 
                                     <span className="flex-initial w-1/4 ">
-
 
                                         <label className="text-xl " htmlFor="maxscore">Score max:</label>
 
@@ -237,7 +226,6 @@ export default function SamplingConfiguration() {
 
                                 <div className="flex justify-center">
 
-
                                     <button type="button" onClick={(e) => {
 
                                         e.preventDefault();
@@ -247,7 +235,6 @@ export default function SamplingConfiguration() {
                                         className="disabled:opacity-30  m-8 inline-flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-2xl">
                                         Lancer l'échantillonnage
                                         </button>
-
 
                                 </div>
 
@@ -261,6 +248,5 @@ export default function SamplingConfiguration() {
 
         {errorMsg && <ErrorNotification msg={errorMsg} />}
     </>
-
 
 }

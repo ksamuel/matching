@@ -92,7 +92,7 @@ export default function SampleTable() {
 
             }).catch((error) => {
                 if (error.response.status === 404) {
-                    history.push(`{BASE_URL}nodatasource/`)
+                    history.push(`${BASE_URL}nodatasource/`)
                 }
                 setErrorMsg(error.response.data)
             })
@@ -111,7 +111,7 @@ export default function SampleTable() {
             } catch (e) {
 
                 if (e.status_code === 404) {
-                    history.push(`{BASE_URL}nosample/`)
+                    history.push(`${BASE_URL}nosample/`)
                 }
 
                 if (e.response.data.detail) {
@@ -142,7 +142,7 @@ export default function SampleTable() {
                 setData(dataResponse.data)
             } catch (e) {
                 if (e.status_code === 404) {
-                    history.push(`{BASE_URL}nosample/`)
+                    history.push(`${BASE_URL}nosample/`)
                 }
                 if (e.response.data.detail) {
                     setErrorMsg(e.response.data.detail)

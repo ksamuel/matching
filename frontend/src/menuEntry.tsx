@@ -11,7 +11,7 @@ export default function MenuEntry({ datasource, currentDatasource, currentSample
     const hasSamples = datasource.samples.length > 0
     const isCurrentDatasource = currentDatasource && datasource.id === currentDatasource.id
 
-    return <div onClick={() => history.push(`{BASE_URL}datasources/${datasource.id}/`)}>
+    return <div onClick={() => history.push(`${BASE_URL}datasources/${datasource.id}/`)}>
 
         <Disclosure as="div" className="space-y-1">
 

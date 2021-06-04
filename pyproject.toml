@@ -37,6 +37,8 @@ black = {version = "^18.3-alpha.0", allows-prereleases = true}
 rich = "^10.2"
 bettererrormessages = "^0.4.0"
 friendly = "^0.3.65"
+pydoit = "^0.0.4"
+doit = "^0.33.1"
 
 [build-system]
 requires = ["poetry>=0.12"]
