@@ -1,4 +1,8 @@
+DOIT_CONFIG = {"verbosity": 2, "default_tasks": ["build"]}
+
+
 def task_build():
+
     """Build for production"""
     return {
         "actions": [

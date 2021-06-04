@@ -40,7 +40,7 @@ export default function SamplingConfiguration() {
 
             }).catch((error) => {
                 if (error.response.status === 404) {
-                    history.push(`${BASE_URL}/nodatasource/`)
+                    history.push(`/nodatasource/`)
                 }
                 setErrorMsg(error.response.data)
             }).finally(() => {
@@ -124,7 +124,7 @@ export default function SamplingConfiguration() {
         createSample(currentDatasource.id, count, minScore, maxScore).then((response) => {
             console.log(response.data)
             dispatch(addSampleToDataSource(response.data))
-            history.push(`${BASE_URL}datasources/${currentDatasource.id}/samples/${response.data.id}`)
+            history.push(`/datasources/${currentDatasource.id}/samples/${response.data.id}`)
         }
         ).catch((error) => {
             if (error.response.data.detail) {

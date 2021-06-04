@@ -11,11 +11,9 @@ import { Provider } from 'react-redux'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import updateLocale from 'dayjs/plugin/updateLocale'
 
-
-
 import Layout from "./layout"
 
-
+import { BASE_URL } from "./utils"
 
 import dayjs from 'dayjs'
 
@@ -44,11 +42,12 @@ dayjs.updateLocale('en', {
 })
 
 
+
 ReactDOM.render(
     <React.StrictMode>
 
         <Provider store={store}>
-            <Router>
+            <Router basename={(new URL(BASE_URL)).pathname}>
                 <Layout />
             </Router>
         </Provider>,
