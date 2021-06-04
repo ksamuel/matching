@@ -2,12 +2,11 @@ import React, { Fragment, useState } from "react";
 import { Transition } from "@headlessui/react";
 import { XCircleIcon } from "@heroicons/react/outline";
 import { XIcon } from "@heroicons/react/solid";
+import axios from "axios"
 
 export function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
-
-export const BASE_URL = document.querySelector('base').href
 
 export const CONTROL_KEYS = [
     'Backspace',
@@ -47,6 +46,24 @@ export function Spinner({ msg }) {
         <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-64 w-64"></div>
     </div>
 }
+
+export function trim(x, characters) {
+    var start = 0;
+    while (characters.indexOf(x[start]) >= 0) {
+        start += 1;
+    }
+    var end = x.length - 1;
+    while (characters.indexOf(x[end]) >= 0) {
+        end -= 1;
+    }
+    return x.substr(start, end - start + 1);
+}
+
+export const BASE_URL = document.querySelector('base').href
+
+export const backend = axios.create({
+    baseURL: trim(BASE_URL, '/'),
+});
 
 export function ErrorNotification({ msg }) {
     const [show, setShow] = useState(true)

@@ -1,18 +1,14 @@
 import React, { useEffect, useState } from "react"
 import { useDropzone } from "react-dropzone"
-import axios from "axios"
+
 
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 
 import { setDatasources, voidDataSource } from "./sampleSlice"
 import { getAllDatasources } from "./api";
-import { ErrorNotification, BASE_URL } from "./utils";
+import { ErrorNotification, BASE_URL, backend } from "./utils";
 
-const backend = axios.create({
-    baseURL: BASE_URL,
-
-});
 
 export default function Dropzone() {
     const dispatch = useDispatch()

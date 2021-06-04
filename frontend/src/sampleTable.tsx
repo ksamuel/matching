@@ -8,16 +8,13 @@ import { BASE_URL } from "./utils"
 
 import { setCurrentDataSource, setCurrentSample } from "./sampleSlice"
 
-import { classNames, ErrorNotification, Spinner } from "./utils";
+import { classNames, ErrorNotification, Spinner, backend } from "./utils";
 
 import axios from "axios";
 import { getDatasource } from "./api";
 
 import dayjs from "dayjs";
 
-const backend = axios.create({
-    baseURL: BASE_URL,
-});
 
 function TripleButton({ value, onChange }) {
 
