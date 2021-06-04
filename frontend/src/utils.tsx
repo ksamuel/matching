@@ -62,7 +62,7 @@ export function trim(x, characters) {
 export const BASE_URL = document.querySelector('base').href
 
 export const backend = axios.create({
-    baseURL: trim(BASE_URL, '/'),
+    baseURL: trim((new URL(BASE_URL)).pathname, '/'),
 });
 
 export function ErrorNotification({ msg }) {
