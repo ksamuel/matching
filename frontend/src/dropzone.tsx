@@ -1,13 +1,13 @@
-import React, {useEffect, useState} from "react"
-import {useDropzone} from "react-dropzone"
+import React, { useEffect, useState } from "react"
+import { useDropzone } from "react-dropzone"
 import axios from "axios"
 
-import {useDispatch} from "react-redux";
-import {useHistory} from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { useHistory } from "react-router-dom";
 
-import {setDatasources, voidDataSource} from "./sampleSlice"
-import {getAllDatasources} from "./api";
-import {ErrorNotification} from "./utils";
+import { setDatasources, voidDataSource } from "./sampleSlice"
+import { getAllDatasources } from "./api";
+import { ErrorNotification } from "./utils";
 
 
 export default function Dropzone() {
@@ -21,7 +21,7 @@ export default function Dropzone() {
     }, [])
 
 
-    const {getRootProps, getInputProps, open, acceptedFiles, fileRejections} = useDropzone({
+    const { getRootProps, getInputProps, open, acceptedFiles, fileRejections } = useDropzone({
         noClick: true,
         noKeyboard: true,
         accept: ['application/xml', 'text/xml'],
@@ -52,7 +52,7 @@ export default function Dropzone() {
     ));
 
 
-    const fileRejectionItems = fileRejections.map(({file, errors}) => (
+    const fileRejectionItems = fileRejections.map(({ file, errors }) => (
         <li key={file.path}>
             {file.path} - {file.size} bytes
             <ul>
@@ -79,8 +79,8 @@ export default function Dropzone() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                 {/* Replace with your content */}
                 <div className="py-4">
-                    <div {...getRootProps({className: 'dropzone'})}
-                         className="p-4 flex flex items-center justify-center flex-col border-4 border-dashed border-gray-200rounded-lg h-96 bg-white">
+                    <div {...getRootProps({ className: 'dropzone' })}
+                        className="p-4 flex flex items-center justify-center flex-col border-4 border-dashed border-gray-200rounded-lg h-96 bg-white">
 
 
                         <input {...getInputProps()} />
@@ -92,14 +92,14 @@ export default function Dropzone() {
 
 
                             <button type="button" onClick={open}
-                                    className="inline-flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-2xl">
+                                className="inline-flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-2xl">
                                 Choisissez un fichier en cliquant ici
                                 {/* Heroicon name: solid/upload */}
                                 <svg xmlns="http://www.w3.org/2000/svg" className="ml-3 -mr-1 h-5 w-5" fill="none"
-                                     viewBox="0 0 24 24" stroke="currentColor">
+                                    viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round"
-                                          strokeWidth="2"
-                                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                                        strokeWidth="2"
+                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                                 </svg>
 
                             </button>
@@ -109,7 +109,7 @@ export default function Dropzone() {
 
                     </div>
 
-                    {errorMsg && <ErrorNotification msg={errorMsg}/>}
+                    {errorMsg && <ErrorNotification msg={errorMsg} />}
 
 
                 </div>

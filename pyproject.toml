@@ -3,7 +3,6 @@ name = "matching"
 version = "0.1.0"
 description = "Web UI to annotate db data pairs similarity"
 authors = ["Kevin Samuel <conctact@kevinsamuel.email>"]
-licence = "Proprietary"
 readme = "README.md"
 homepage = "https://github.com/ksamuel/matching/"
 repository = "https://github.com/ksamuel/matching.git"
@@ -21,6 +20,7 @@ psycopg2 = "==2.8.6"
 python-dotenv = "==0.17.1"
 redis = "==3.5.3"
 sqlalchemy = "==1.4.12"
+django_extensions = "^3.1"
 
 [tool.poetry.dev-dependencies]
 django-stubs = "^1.8"
@@ -31,9 +31,12 @@ pylint-django = "^2.4"
 pylint-plugin-utils = "^0.6.0"
 pytest = "^6.2"
 pytest-django = "^4.2"
-django_extensions = "^3.1"
 poetry = "^1.1"
-black = "^21.5b1"
+pytest-clarity = {version = "^0.1.0-alpha.1", allows-prereleases = true}
+black = {version = "^18.3-alpha.0", allows-prereleases = true}
+rich = "^10.2"
+bettererrormessages = "^0.4.0"
+friendly = "^0.3.65"
 
 [build-system]
 requires = ["poetry>=0.12"]

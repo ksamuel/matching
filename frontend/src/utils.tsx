@@ -1,13 +1,13 @@
-import React, {Fragment, useState} from "react";
-import {Transition} from "@headlessui/react";
-import {XCircleIcon} from "@heroicons/react/outline";
-import {XIcon} from "@heroicons/react/solid";
+import React, { Fragment, useState } from "react";
+import { Transition } from "@headlessui/react";
+import { XCircleIcon } from "@heroicons/react/outline";
+import { XIcon } from "@heroicons/react/solid";
 
 export function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
-
+export const BASE_URL = document.querySelector('base').href
 
 export const CONTROL_KEYS = [
     'Backspace',
@@ -38,8 +38,7 @@ export function toFixedTrunc(x, n) {
     return parseFloat(`${v[0]}.${f}`)
 }
 
-export function Spinner({msg}) {
-
+export function Spinner({ msg }) {
 
     return <div className="flex h-screen justify-center items-center flex-col">
         <h1 className="text-center my-20 text-4xl font-extrabold text-gray-600 sm:text-5xl sm:tracking-tight lg:text-6xl">
@@ -49,7 +48,7 @@ export function Spinner({msg}) {
     </div>
 }
 
-export function ErrorNotification({msg}) {
+export function ErrorNotification({ msg }) {
     const [show, setShow] = useState(true)
 
     return (
@@ -76,7 +75,7 @@ export function ErrorNotification({msg}) {
                             <div className="p-4">
                                 <div className="flex items-start">
                                     <div className="flex-shrink-0">
-                                        <XCircleIcon className="h-6 w-6 text-red-400" aria-hidden="true"/>
+                                        <XCircleIcon className="h-6 w-6 text-red-400" aria-hidden="true" />
                                     </div>
                                     <div className="ml-3 w-0 flex-1 pt-0.5">
                                         <p className="text-lg font-medium text-gray-900">Il y a un problème</p>
@@ -90,7 +89,7 @@ export function ErrorNotification({msg}) {
                                             }}
                                         >
                                             <span className="sr-only">Close</span>
-                                            <XIcon className="h-5 w-5" aria-hidden="true"/>
+                                            <XIcon className="h-5 w-5" aria-hidden="true" />
                                         </button>
                                     </div>
                                 </div>

@@ -6,15 +6,18 @@ import {
     BrowserRouter as Router,
 } from "react-router-dom";
 
-import {Provider} from 'react-redux'
+import { Provider } from 'react-redux'
 
 import relativeTime from 'dayjs/plugin/relativeTime'
 import updateLocale from 'dayjs/plugin/updateLocale'
 
+import axios from "axios"
+
 import Layout from "./layout"
 
-import dayjs from 'dayjs'
+import { BASE_URL } from "./utils"
 
+import dayjs from 'dayjs'
 
 import store from './store'
 
@@ -40,12 +43,14 @@ dayjs.updateLocale('en', {
     }
 })
 
+axios.defaults.baseURL = BASE_URL
+
 ReactDOM.render(
     <React.StrictMode>
 
         <Provider store={store}>
             <Router>
-                <Layout/>
+                <Layout />
             </Router>
         </Provider>,
     </React.StrictMode>,
