@@ -39,7 +39,7 @@ export default function Dropzone() {
                 }
             }).then((response) => {
                 getAllDatasources().then((response) => dispatch(setDatasources(response.data)))
-                history.push(`/datasources/${response.data}`)
+                history.push(`{BASE_URL}datasources/${response.data}`)
             }).catch((error) => {
 
                 setErrorMsg(error.response.data)
