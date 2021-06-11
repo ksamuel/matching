@@ -13,7 +13,6 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-import urllib.parse
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -31,55 +30,37 @@ from backend.views import (
     update_pair_status,
 )
 
-URL_PREFIX = urllib.parse.urlparse(settings.BASE_URL).path.strip("/")
-if URL_PREFIX:
-    URL_PREFIX += "/"
-
 frontend_urls = [
-    URL_PREFIX + "",
-    URL_PREFIX + "index.html",
-    URL_PREFIX + "datasources/<datasourceId>/samples/<sampleId>/",
-    URL_PREFIX + "datasources/<datasourceId>/",
-    URL_PREFIX + "nodatasource/",
-    URL_PREFIX + "nosample/",
+    "",
+    "datasources/<datasourceId>/samples/<sampleId>/",
+    "datasources/<datasourceId>/",
+    "nodatasource/",
+    "nosample/",
 ]
 
 urlpatterns = (
     [
         # path("admin/", admin.site.urls),
         re_path(
-            URL_PREFIX
-            + "api/v1/samples/(?P<sample_id>[0-9a-f-]{36})/pairs/(?P<pair_id>[0-9A-Z]+)/status",
+            "api/v1/samples/(?P<sample_id>[0-9a-f-]{36})/pairs/(?P<pair_id>[0-9A-Z]+)/status",
             update_pair_status,
         ),
+        re_path("api/v1/samples/(?P<sample_id>[0-9a-f-]{36})/data/", get_sample_data),
         re_path(
-            URL_PREFIX + "api/v1/samples/(?P<sample_id>[0-9a-f-]{36})/data/",
-            get_sample_data,
+            "api/v1/samples/(?P<sample_id>[0-9a-f-]{36})/params/", get_sample_params
         ),
         re_path(
-            URL_PREFIX + "api/v1/samples/(?P<sample_id>[0-9a-f-]{36})/params/",
-            get_sample_params,
-        ),
-        re_path(
-            URL_PREFIX
-            + "api/v1/datasources/(?P<datasource_id>[0-9a-f]{64})/scoreboundaries/",
+            "api/v1/datasources/(?P<datasource_id>[0-9a-f]{64})/scoreboundaries/",
             score_boundaries,
         ),
         re_path(
-            URL_PREFIX + "api/v1/datasources/(?P<datasource_id>[0-9a-f]{64})/samples/",
-            create_sample,
+            "api/v1/datasources/(?P<datasource_id>[0-9a-f]{64})/samples/", create_sample
         ),
-        re_path(
-            URL_PREFIX + "api/v1/datasources/(?P<datasource_id>[0-9a-f]{64})/",
-            datasource,
-        ),
-        path(URL_PREFIX + "api/v1/datasources/", datasource_list),
-        path(URL_PREFIX + "upload_file/", upload_file),
+        re_path("api/v1/datasources/(?P<datasource_id>[0-9a-f]{64})/", datasource),
+        path("api/v1/datasources/", datasource_list),
+        path("upload_file/", upload_file),
     ]
-    + static(
-        URL_PREFIX.rstrip("/") + "/assets/",
-        document_root=settings.FRONTEND_DIR / "assets",
-    )
+    + static("/assets/", document_root=settings.FRONTEND_DIR / "assets")
     + [
         path(
             url,
