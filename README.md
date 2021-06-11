@@ -22,8 +22,7 @@ At boot. It should also pass the following environment variables:
 - DEBUG: this should be false in production. Default is false.
 - SECRET_KEY: put here a randomly generated secret key used for session management
 - ALLOWED_HOST: the IP of the server or the domain name to access the website Example values for env vars:
-- BASE_URL: the absolute url root to serve the site with. This must match you apache/nginx config and well set the HTML
-  base tag.
+- URL_PREFIX: a piece of URL path to prepend to all path in the application. This must match you apache/nginx routing and will set the HTML `<base>` tag.
 - LOG_LEVEL: between "debug", "info", "warning", "error" and "critical". Default is "warning".
 
 E.G:
@@ -34,7 +33,7 @@ REDIS_URL=redis://127.0.0.1:6379/0
 SECRET_KEY=#2t!6-q@)!lxa@bupm%4*e5bn-1q&$rwg#+q&9o!o4mormm=-b
 DEBUG=false
 ALLOWED_HOST=183.12.12.34
-BASE_URL=http://183.12.12.34:8989/matching/
+URL_PREFIX=/matching/
 LOG_LEVEL="error"
 ```
 

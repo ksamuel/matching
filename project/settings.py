@@ -17,6 +17,7 @@ import django12factor
 from django.core.management.utils import get_random_secret_key
 
 from dotenv import load_dotenv
+import urllib
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,17 +30,15 @@ FRONTEND_DIR = BASE_DIR / "frontend/dist/"
 load_dotenv()
 
 d12f = django12factor.factorise(
-    custom_settings=(
-        "INSERJEUNES_DB_PWD",
-        "REDIS_URL",
-        "BASE_URL",
-        "CORS_ALLOWED_ORIGINS",
-    )
+    custom_settings=("INSERJEUNES_DB_PWD", "REDIS_URL", "CORS_ALLOWED_ORIGINS")
 )
 
 SECRET_KEY = d12f["SECRET_KEY"]
 
-BASE_URL = d12f["BASE_URL"]
+URL_PREFIX = os.environ.get("URL_PREFIX", "/")
+
+FORCE_SCRIPT_NAME = URL_PREFIX
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = d12f["DEBUG"]

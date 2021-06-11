@@ -42,7 +42,7 @@ urlpatterns = (
     [
         # path("admin/", admin.site.urls),
         re_path(
-            "api/v1/samples/(?P<sample_id>[0-9a-f-]{36})/pairs/(?P<pair_id>[0-9A-Z]+)/status",
+            "api/v1/samples/(?P<sample_id>[0-9a-f-]{36})/pairs/(?P<pair_id>[0-9A-Z]+)/status/",
             update_pair_status,
         ),
         re_path("api/v1/samples/(?P<sample_id>[0-9a-f-]{36})/data/", get_sample_data),
@@ -66,7 +66,7 @@ urlpatterns = (
             url,
             TemplateView.as_view(
                 template_name="index.html",
-                extra_context={"BASE_URL": settings.BASE_URL},
+                extra_context={"URL_PREFIX": settings.URL_PREFIX},
             ),
         )
         for url in frontend_urls

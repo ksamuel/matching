@@ -13,7 +13,7 @@ import updateLocale from 'dayjs/plugin/updateLocale'
 
 import Layout from "./layout"
 
-import { BASE_URL } from "./utils"
+import { URL_PREFIX } from "./utils"
 
 import dayjs from 'dayjs'
 
@@ -41,12 +41,11 @@ dayjs.updateLocale('en', {
     }
 })
 
-
 ReactDOM.render(
     <React.StrictMode>
 
         <Provider store={store}>
-            <Router basename={BASE_URL}>
+            <Router basename={URL_PREFIX}>
                 <Layout />
             </Router>
         </Provider>,

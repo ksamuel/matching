@@ -188429,8 +188429,8 @@ function trim(x, characters) {
   }
   return x.substr(start, end - start + 1);
 }
-const BASE_URL = "/" + trim(new URL(document.querySelector("base").href).pathname, "/");
-const backend = axios.create({});
+const URL_PREFIX = "/" + trim(new URL(document.querySelector("base").href).pathname, "/");
+const backend = axios.create();
 function ErrorNotification({msg}) {
   const [show, setShow] = react.useState(true);
   return /* @__PURE__ */ react.createElement(react.Fragment, null, /* @__PURE__ */ react.createElement("div", {
@@ -188491,13 +188491,13 @@ const createSample = (uid, count, minScore, maxScore) => {
   return backend.post(`api/v1/datasources/${uid}/samples/`, {count, min: minScore, max: maxScore});
 };
 const getSampleData = (sampleId) => {
-  return backend.get(`api/v1/samples/${sampleId}/data`);
+  return backend.get(`api/v1/samples/${sampleId}/data/`);
 };
 const updatePairStatus = (sampleId, pairId, status) => {
-  return backend.put(`api/v1/samples/${sampleId}/pairs/${pairId}/status`, {"status": status});
+  return backend.put(`api/v1/samples/${sampleId}/pairs/${pairId}/status/`, {"status": status});
 };
 const getSampleParams = (sampleId) => {
-  return backend.get(`api/v1/samples/${sampleId}/params`);
+  return backend.get(`api/v1/samples/${sampleId}/params/`);
 };
 const uploadFile = (formData) => {
   return backend.post("upload_file/", formData, {
@@ -189152,6 +189152,6 @@ dayjs_min.updateLocale("en", {
 reactDom.render(/* @__PURE__ */ react.createElement(react.StrictMode, null, /* @__PURE__ */ react.createElement(Provider, {
   store
 }, /* @__PURE__ */ react.createElement(BrowserRouter, {
-  basename: BASE_URL
+  basename: URL_PREFIX
 }, /* @__PURE__ */ react.createElement(Layout, null))), ","), document.getElementById("root"));
-//# sourceMappingURL=index.e66f639b.js.map
+//# sourceMappingURL=index.488a1b40.js.map

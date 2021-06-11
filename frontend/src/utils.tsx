@@ -59,11 +59,11 @@ export function trim(x, characters) {
     return x.substr(start, end - start + 1);
 }
 
-export const BASE_URL = "/" + trim(new URL(document.querySelector('base').href).pathname, '/')
+// Even if it's a relative path, we will get an absolute URL
+// so we must extrat the path again.
+export const URL_PREFIX = "/" + trim(new URL(document.querySelector('base').href).pathname, '/')
 
-export const backend = axios.create({
-    //baseURL: BASE_URL,
-});
+export const backend = axios.create();
 
 export function ErrorNotification({ msg }) {
     const [show, setShow] = useState(true)

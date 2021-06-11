@@ -18,15 +18,15 @@ export const createSample = (uid, count, minScore, maxScore) => {
 }
 
 export const getSampleData = (sampleId) => {
-    return backend.get(`api/v1/samples/${sampleId}/data`)
+    return backend.get(`api/v1/samples/${sampleId}/data/`)
 }
 
 export const updatePairStatus = (sampleId, pairId, status) => {
-    return backend.put(`api/v1/samples/${sampleId}/pairs/${pairId}/status`, { 'status': status })
+    return backend.put(`api/v1/samples/${sampleId}/pairs/${pairId}/status/`, { 'status': status })
 }
 
 export const getSampleParams = (sampleId) => {
-    return backend.get(`api/v1/samples/${sampleId}/params`)
+    return backend.get(`api/v1/samples/${sampleId}/params/`)
 }
 
 export const uploadFile = (formData) => {
