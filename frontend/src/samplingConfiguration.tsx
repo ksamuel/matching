@@ -8,7 +8,7 @@ import 'rc-slider/assets/index.css'
 import findCurrentData from "./selectors"
 
 import { addSampleToDataSource, setCurrentDataSource, setCurrentSample } from "./sampleSlice"
-import { classNames, CONTROL_KEYS, ErrorNotification, Spinner, toFixedTrunc, BASE_URL } from "./utils";
+import { classNames, CONTROL_KEYS, ErrorNotification, Spinner, toFixedTrunc } from "./utils";
 import { createSample, getDatasource, getScoreBoundaries } from "./api";
 
 const { Range } = Slider

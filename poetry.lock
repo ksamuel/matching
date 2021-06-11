@@ -341,6 +341,17 @@ version = "0.8.0"
 
 [[package]]
 category = "main"
+description = "django-cors-headers is a Django application for handling the server headers required for Cross-Origin Resource Sharing (CORS)."
+name = "django-cors-headers"
+optional = false
+python-versions = ">=3.6"
+version = "3.7.0"
+
+[package.dependencies]
+Django = ">=2.2"
+
+[[package]]
+category = "main"
 description = "Extensions for Django"
 name = "django-extensions"
 optional = false
@@ -1603,7 +1614,7 @@ python-versions = ">=3.6"
 version = "3.4.1"
 
 [metadata]
-content-hash = "7b6d8ebf8e0cd486a1767a68d792d53c9860e174ef78ae7694bce6deee422476"
+content-hash = "68303a0951fba9d83dac081b7c09a27eefac88d54a731daffb2d048c7960e5b9"
 python-versions = "^3.6"
 
 [metadata.hashes]
@@ -1641,6 +1652,7 @@ dj-database-url = ["ca01768fdecde134301f3170743226f60edff5c3935f12437378ebd91150
 dj-email-url = ["8dc26d22f23fae2c1edcb1417491470aa79909e5818074a240c471d48f0b7cd8"]
 django = ["32ce792ee9b6a0cbbec340123e229ac9f765dff8c2a4ae9247a14b2ba3a365a7", "baf099db36ad31f970775d0be5587cc58a6256a6771a44eb795b554d45f211b8"]
 django-cache-url = ["b2c0b399c25588c2a19729f50398b30a8d279396b4449cacd07b34d20e2f52de", "b8b1ec88668ccaf27c8617dc5148d480e955dd2f925555bb1a2411e01c14ffa8"]
+django-cors-headers = ["1ac2b1213de75a251e2ba04448da15f99bcfcbe164288ae6b5ff929dc49b372f", "96069c4aaacace786a34ee7894ff680780ec2644e4268b31181044410fecd12e"]
 django-extensions = ["50de8977794a66a91575dd40f87d5053608f679561731845edbd325ceeb387e3", "5f0fea7bf131ca303090352577a9e7f8bfbf5489bd9d9c8aea9401db28db34a0"]
 django-redis = ["1133b26b75baa3664164c3f44b9d5d133d1b8de45d94d79f38d1adc5b1d502e5", "306589c7021e6468b2656edc89f62b8ba67e8d5a1c8877e2688042263daa7a63"]
 django-stubs = ["717967d7fee0a6af0746724a0be80d72831a982a40fa8f245a6a46f4cafd157b", "bde9e44e3c4574c2454e74a3e607cc3bc23b0441bb7d1312cd677d5e30984b74"]

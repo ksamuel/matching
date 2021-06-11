@@ -1,6 +1,6 @@
 import { Disclosure } from "@headlessui/react";
 import React from "react";
-import { classNames, BASE_URL } from "./utils";
+import { classNames } from "./utils";
 
 import { Link, useHistory } from "react-router-dom";
 import dayjs from "dayjs";

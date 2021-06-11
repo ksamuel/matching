@@ -29,7 +29,12 @@ FRONTEND_DIR = BASE_DIR / "frontend/dist/"
 load_dotenv()
 
 d12f = django12factor.factorise(
-    custom_settings=("INSERJEUNES_DB_PWD", "REDIS_URL", "BASE_URL")
+    custom_settings=(
+        "INSERJEUNES_DB_PWD",
+        "REDIS_URL",
+        "BASE_URL",
+        "CORS_ALLOWED_ORIGINS",
+    )
 )
 
 SECRET_KEY = d12f["SECRET_KEY"]
@@ -43,6 +48,13 @@ ALLOWED_HOSTS = d12f["ALLOWED_HOSTS"] + ["127.0.0.1", "localhost"]
 
 INSERJEUNES_DB_PWD = d12f["INSERJEUNES_DB_PWD"]
 
+CORS_ALLOWED_ORIGINS = d12f["CORS_ALLOWED_ORIGINS"]
+
+if CORS_ALLOWED_ORIGINS is None:
+    CORS_ALLOWED_ORIGINS = []
+else:
+    CORS_ALLOWED_ORIGINS = CORS_ALLOWED_ORIGINS.split(",")
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -53,9 +65,11 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_extensions",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -147,20 +161,9 @@ LOG_LEVEL = os.environ.get("LOG_LEVEL", "WARNING").upper()
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-        },
-    },
-    "root": {
-        "handlers": ["console"],
-        "level": LOG_LEVEL,
-    },
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "root": {"handlers": ["console"], "level": LOG_LEVEL},
     "loggers": {
-        "django": {
-            "handlers": ["console"],
-            "level": LOG_LEVEL,
-            "propagate": False,
-        },
+        "django": {"handlers": ["console"], "level": LOG_LEVEL, "propagate": False}
     },
 }

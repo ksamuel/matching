@@ -1,6 +1,5 @@
 
-import { BASE_URL, trim, backend } from "./utils";
-
+import { backend } from "./utils";
 
 export const getAllDatasources = () => {
     return backend.get('/api/v1/datasources/')
