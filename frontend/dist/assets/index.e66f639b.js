@@ -188429,10 +188429,8 @@ function trim(x, characters) {
   }
   return x.substr(start, end - start + 1);
 }
-const BASE_URL = document.querySelector("base").href;
-const backend = axios.create({
-  baseURL: trim(new URL(BASE_URL).pathname, "/")
-});
+const BASE_URL = "/" + trim(new URL(document.querySelector("base").href).pathname, "/");
+const backend = axios.create({});
 function ErrorNotification({msg}) {
   const [show, setShow] = react.useState(true);
   return /* @__PURE__ */ react.createElement(react.Fragment, null, /* @__PURE__ */ react.createElement("div", {
@@ -188481,16 +188479,32 @@ function ErrorNotification({msg}) {
   }))))))))));
 }
 const getAllDatasources = () => {
-  return backend.get("/api/v1/datasources/");
+  return backend.get("api/v1/datasources/");
 };
 const getDatasource = (uid) => {
-  return backend.get(`/api/v1/datasources/${uid}/`);
+  return backend.get(`api/v1/datasources/${uid}/`);
 };
 const getScoreBoundaries = (uid) => {
-  return backend.get(`/api/v1/datasources/${uid}/scoreboundaries/`);
+  return backend.get(`api/v1/datasources/${uid}/scoreboundaries/`);
 };
 const createSample = (uid, count, minScore, maxScore) => {
-  return backend.post(`/api/v1/datasources/${uid}/samples/`, {count, min: minScore, max: maxScore});
+  return backend.post(`api/v1/datasources/${uid}/samples/`, {count, min: minScore, max: maxScore});
+};
+const getSampleData = (sampleId) => {
+  return backend.get(`api/v1/samples/${sampleId}/data`);
+};
+const updatePairStatus = (sampleId, pairId, status) => {
+  return backend.put(`api/v1/samples/${sampleId}/pairs/${pairId}/status`, {"status": status});
+};
+const getSampleParams = (sampleId) => {
+  return backend.get(`api/v1/samples/${sampleId}/params`);
+};
+const uploadFile = (formData) => {
+  return backend.post("upload_file/", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data"
+    }
+  });
 };
 function Dropzone() {
   const dispatch = useDispatch();
@@ -188507,11 +188521,7 @@ function Dropzone() {
       setErrorMsg("");
       var formData = new FormData();
       formData.append("xml", files2[0]);
-      backend.post("/upload_file/", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data"
-        }
-      }).then((response) => {
+      uploadFile(formData).then((response) => {
         getAllDatasources().then((response2) => dispatch(setDatasources(response2.data)));
         history.push(`/datasources/${response.data}`);
       }).catch((error) => {
@@ -188621,7 +188631,7 @@ function Sidebar() {
     to: "/"
   }, /* @__PURE__ */ react.createElement("img", {
     className: "w-auto",
-    src: `${trim(BASE_URL, "/")}${logo}`,
+    src: `${trim(logo, "/")}`,
     alt: "Workflow"
   }))), /* @__PURE__ */ react.createElement("div", {
     className: "mt-5 flex-grow flex flex-col"
@@ -188917,7 +188927,7 @@ function SampleTable() {
       try {
         setLoading("Chargement de l'\xE9chantillon");
         setData([]);
-        const paramResponse = await backend.get(`/api/v1/samples/${sampleId}/params`);
+        const paramResponse = await getSampleParams(sampleId);
         dispatch(setCurrentSample(paramResponse.data));
         dispatch(setCurrentDataSource(currentDatasource));
       } catch (e) {
@@ -188942,7 +188952,7 @@ function SampleTable() {
     (async () => {
       try {
         setLoading("Chargement de l'\xE9chantillon");
-        const dataResponse = await backend.get(`/api/v1/samples/${sampleId}/data`);
+        const dataResponse = await getSampleData(sampleId);
         setData(dataResponse.data);
       } catch (e) {
         if (e.status_code === 404) {
@@ -188959,8 +188969,8 @@ function SampleTable() {
       }
     })();
   }, [sampleId]);
-  const updatePairStatus = (value, pair_id) => {
-    backend.put(`/api/v1/samples/${currentSample.id}/pairs/${pair_id}/status`, {"status": value});
+  const changePairStatus = (value, pair_id) => {
+    updatePairStatus(currentSample.id, pair_id, value);
     setData(data.map((pair) => {
       if (pair.id === pair_id) {
         return __spreadProps(__spreadValues({}, pair), {status: value});
@@ -189065,7 +189075,7 @@ function SampleTable() {
       className: "px-2 py-4 whitespace-nowrap text-center text-sm border border-gray-300   font-medium"
     }, /* @__PURE__ */ react.createElement(TripleButton, {
       value: status,
-      onChange: (value) => updatePairStatus(value, id)
+      onChange: (value) => changePairStatus(value, id)
     })));
   })))) : /* @__PURE__ */ react.createElement(Spinner, {
     msg: loading
@@ -189142,6 +189152,6 @@ dayjs_min.updateLocale("en", {
 reactDom.render(/* @__PURE__ */ react.createElement(react.StrictMode, null, /* @__PURE__ */ react.createElement(Provider, {
   store
 }, /* @__PURE__ */ react.createElement(BrowserRouter, {
-  basename: new URL(BASE_URL).pathname
+  basename: BASE_URL
 }, /* @__PURE__ */ react.createElement(Layout, null))), ","), document.getElementById("root"));
-//# sourceMappingURL=index.0513e70c.js.map
+//# sourceMappingURL=index.e66f639b.js.map

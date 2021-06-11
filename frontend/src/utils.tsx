@@ -59,10 +59,10 @@ export function trim(x, characters) {
     return x.substr(start, end - start + 1);
 }
 
-export const BASE_URL = document.querySelector('base').href
+export const BASE_URL = "/" + trim(new URL(document.querySelector('base').href).pathname, '/')
 
 export const backend = axios.create({
-    baseURL: trim((new URL(BASE_URL)).pathname, '/'),
+    //baseURL: BASE_URL,
 });
 
 export function ErrorNotification({ msg }) {

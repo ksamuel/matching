@@ -4,17 +4,13 @@ import { useDispatch } from "react-redux";
 
 import findCurrentData from "./selectors"
 
-import { BASE_URL } from "./utils"
-
 import { setCurrentDataSource, setCurrentSample } from "./sampleSlice"
 
 import { classNames, ErrorNotification, Spinner, backend } from "./utils";
 
-import axios from "axios";
-import { getDatasource } from "./api";
+import { getDatasource, getSampleData, getSampleParams, updatePairStatus } from "./api";
 
 import dayjs from "dayjs";
-
 
 function TripleButton({ value, onChange }) {
 
@@ -101,7 +97,7 @@ export default function SampleTable() {
             try {
                 setLoading("Chargement de l'échantillon")
                 setData([])
-                const paramResponse = await backend.get(`/api/v1/samples/${sampleId}/params`)
+                const paramResponse = await getSampleParams(sampleId)
                 dispatch(setCurrentSample(paramResponse.data))
                 dispatch(setCurrentDataSource(currentDatasource))
 
@@ -135,7 +131,7 @@ export default function SampleTable() {
         (async () => {
             try {
                 setLoading("Chargement de l'échantillon")
-                const dataResponse = await backend.get(`/api/v1/samples/${sampleId}/data`)
+                const dataResponse = await getSampleData(sampleId)
                 setData(dataResponse.data)
             } catch (e) {
                 if (e.status_code === 404) {
@@ -155,8 +151,8 @@ export default function SampleTable() {
 
     }, [sampleId])
 
-    const updatePairStatus = (value, pair_id) => {
-        backend.put(`/api/v1/samples/${currentSample.id}/pairs/${pair_id}/status`, { 'status': value })
+    const changePairStatus = (value, pair_id) => {
+        updatePairStatus(currentSample.id, pair_id, value)
         setData(data.map((pair) => {
             if (pair.id === pair_id) {
                 return { ...pair, status: value }
@@ -288,7 +284,7 @@ export default function SampleTable() {
                                                 <td className="px-4 py-4 whitespace-nowrap text-center border border-gray-300 w-8 font-medium text-sm text-gray-500">{score}</td>
                                                 <td className="px-2 py-4 whitespace-nowrap text-center text-sm border border-gray-300   font-medium">
                                                     <TripleButton value={status}
-                                                        onChange={(value) => updatePairStatus(value, id)} />
+                                                        onChange={(value) => changePairStatus(value, id)} />
                                                 </td>
                                             </tr>
                                         })}

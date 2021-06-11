@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from "react"
 import { useDropzone } from "react-dropzone"
 
-
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 
 import { setDatasources, voidDataSource } from "./sampleSlice"
-import { getAllDatasources } from "./api";
-import { ErrorNotification, BASE_URL, backend } from "./utils";
-
+import { getAllDatasources, uploadFile } from "./api";
+import { ErrorNotification, backend } from "./utils";
 
 export default function Dropzone() {
     const dispatch = useDispatch()
@@ -29,11 +27,7 @@ export default function Dropzone() {
             var formData = new FormData();
             formData.append("xml", files[0]);
 
-            backend.post('/upload_file/', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            }).then((response) => {
+            uploadFile(formData).then((response) => {
                 getAllDatasources().then((response) => dispatch(setDatasources(response.data)))
                 history.push(`/datasources/${response.data}`)
             }).catch((error) => {

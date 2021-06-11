@@ -41,11 +41,12 @@ dayjs.updateLocale('en', {
     }
 })
 
+
 ReactDOM.render(
     <React.StrictMode>
 
         <Provider store={store}>
-            <Router basename={(new URL(BASE_URL)).pathname}>
+            <Router basename={BASE_URL}>
                 <Layout />
             </Router>
         </Provider>,
