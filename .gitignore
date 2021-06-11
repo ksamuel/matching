@@ -232,3 +232,6 @@ lerna-debug.log
 Thumbs.db
 
 secret_key
+
+# database
+*.db
