@@ -44,8 +44,8 @@ class DBApi:
                 func.min(self.table.c.score_confiance),
                 func.max(self.table.c.score_confiance),
             )
-                .select_from(self.table)
-                .where(self.table.c.poids.is_(None))
+            .select_from(self.table)
+            .where(self.table.c.poids.is_(None))
         ).one()
 
         if None in (min_score, max_score):
@@ -65,30 +65,34 @@ class DBApi:
         weight = (
             self.connection.execute(
                 select(func.count(self.table.c.id))
-                    .select_from(self.table)
-                    .where(self.table.c.poids.is_(None))
+                .select_from(self.table)
+                .where(
+                    self.table.c.poids.is_(None),
+                    max_score >= self.table.c.score_confiance,
+                    self.table.c.score_confiance >= min_score,
+                )
             ).scalar()
             / size
         )
 
         selection = (
             select(self.table.c.id)
-                .select_from(self.table)
-                .where(
+            .select_from(self.table)
+            .where(
                 max_score >= self.table.c.score_confiance,
                 self.table.c.score_confiance >= min_score,
                 self.table.c.poids.is_(None),
             )
-                .order_by(func.random())
-                .limit(size)
+            .order_by(func.random())
+            .limit(size)
         )
 
         results = list(
             self.connection.execute(
                 update(self.table)
-                    .where(self.table.c.id.in_(selection))
-                    .values({self.table.c.poids: weight})
-                    .returning(*[column(c) for c in self.inline_tables()])
+                .where(self.table.c.id.in_(selection))
+                .values({self.table.c.poids: weight})
+                .returning(*[column(c) for c in self.inline_tables()])
             )
         )
 
@@ -109,8 +113,8 @@ class DBApi:
     def update_pair_status(self, pair_id, status):
         self.connection.execute(
             update(self.table)
-                .where(self.table.c.id == pair_id)
-                .values({self.table.c.prediction_annotation: status})
+            .where(self.table.c.id == pair_id)
+            .values({self.table.c.prediction_annotation: status})
         )
 
     @classmethod
