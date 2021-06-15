@@ -29,9 +29,9 @@ function TripleButton({ value, onChange }) {
                 onClick={onClick("ok")}
                 type="button"
                 className={classNames(status === "ok" ? "bg-green-200" : "hover:bg-gray-200",
-                    "relative inline-flex items-center px-4 py-2",
+                    "relative inline-flex items-center px-2 py-2",
                     "rounded-l-md border border-gray-300 bg-white border-gray-300",
-                    "text-sm font-medium text-gray-700  focus:z-10",
+                    "text-xs font-medium text-gray-700  focus:z-10",
                     "focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500")}
             >
                 OK
@@ -40,8 +40,8 @@ function TripleButton({ value, onChange }) {
                 onClick={onClick("nok")}
                 type="button"
                 className={classNames(status === "nok" ? "bg-red-200" : "hover:bg-gray-200",
-                    "-ml-px relative inline-flex items-center px-4 py-2 border border-gray-300",
-                    "bg-white text-sm font-medium text-gray-700  focus:z-10",
+                    "-ml-px relative inline-flex items-center px-2 py-2 border border-gray-300",
+                    "bg-white text-xs font-medium text-gray-700  focus:z-10",
                     "focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500")}
             >
                 NOK
@@ -50,8 +50,8 @@ function TripleButton({ value, onChange }) {
                 onClick={onClick("?")}
                 type="button"
                 className={classNames(status === "?" ? "bg-yellow-200" : "hover:bg-gray-200",
-                    "-ml-px relative inline-flex items-center px-4 py-2 rounded-r-md border",
-                    "border-gray-300 bg-white text-sm font-medium text-gray-700  focus:z-10",
+                    "-ml-px relative inline-flex items-center px-2 py-2 rounded-r-md border",
+                    "border-gray-300 bg-white text-xs font-medium text-gray-700  focus:z-10",
                     "focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500")}
             >
                 ?
@@ -196,7 +196,7 @@ export default function SampleTable() {
 
     return (<> {currentDatasource &&
         <header className="bg-white shadow  ">
-            <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto py-6 px-2 sm:px-6 lg:px-8">
                 <h1 className="text-2xl  text-gray-900 truncate mb-2">{currentDatasource.name}
                 </h1>
                 <p><span
@@ -226,9 +226,9 @@ export default function SampleTable() {
                                                 return <th key={field}
                                                     scope="col"
                                                     colSpan={2}
-                                                    className=" px-2 py-3 border border-gray-300 w-8 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                                    className=" py-3 border border-gray-300  text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                                                 >
-                                                    {field}
+                                                    {field.replace('similarite_', '')}
                                                 </th>
                                             })}
 
@@ -273,15 +273,15 @@ export default function SampleTable() {
                                                     const type = schema[name].type
                                                     return <Fragment key={name}>
                                                         <td
-                                                            className={classNames(type === "gender" || type === "date" ? "text-center" : "",
-                                                                "px-2 border border-gray-300 w-8 whitespace-nowrap text-sm text-gray-500")}
+                                                            className={classNames(type === "gender" || type === "date" ? "text-center w-4" : "w-8",
+                                                                "px-2 border border-gray-300  whitespace-nowrap text-sm text-gray-500")}
                                                             dangerouslySetInnerHTML={{ __html: value1 + (value2 ? "<br/>" : '') + value2 }}
                                                         ></td>
                                                         <td className=" px-2 w-4 text-center   whitespace-nowrap border border-gray-300   text-sm text-gray-500 ">{similarity}</td>
                                                     </Fragment>
                                                 }))}
 
-                                                <td className="px-4 py-4 whitespace-nowrap text-center border border-gray-300 w-8 font-medium text-sm text-gray-500">{score}</td>
+                                                <td className="px-2 py-4 whitespace-nowrap text-center border border-gray-300   font-medium text-sm text-gray-500">{score}</td>
                                                 <td className="px-2 py-4 whitespace-nowrap text-center text-sm border border-gray-300   font-medium">
                                                     <TripleButton value={status}
                                                         onChange={(value) => changePairStatus(value, id)} />
