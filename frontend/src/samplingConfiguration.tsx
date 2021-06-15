@@ -53,16 +53,19 @@ export default function SamplingConfiguration() {
             dispatch(setCurrentSample(null))
             setLoading('')
         }
-        if (!minScore) {
-            getScoreBoundaries(datasourceId).then((response) => {
-                setMinScore(response.data.min)
-                setMaxScore(response.data.max)
-                setMinScoreBoundary(response.data.min)
-                setMaxScoreBoundary(response.data.max)
-            })
-        }
 
-    }, [sampleId, currentDatasource, maxScore])
+        setLoading("Chargement des paramètres d'échantillonnage")
+        getScoreBoundaries(datasourceId).then((response) => {
+            const max = toFixedTrunc(response.data.max, 2)
+            const min = toFixedTrunc(response.data.min, 2)
+            setMinScoreBoundary(min)
+            setMaxScoreBoundary(max)
+            setMinScore(min)
+            setMaxScore(max)
+            setLoading('')
+        })
+
+    }, [datasourceId])
 
     const updateMinScore = (score) => {
         const cleanScore = parseFloat(score.replace(',', '.').replace(/[^\d.]/g, ''))

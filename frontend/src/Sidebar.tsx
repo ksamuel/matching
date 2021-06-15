@@ -8,7 +8,7 @@ import { Link } from "react-router-dom"
 import { getAllDatasources } from "./api"
 import { setDatasources } from "./sampleSlice"
 
-import { trim } from "./utils"
+
 
 export default function Sidebar() {
 
