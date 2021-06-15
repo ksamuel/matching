@@ -26,7 +26,7 @@ export default function Sidebar() {
         <div className="flex flex-col  border-r border-gray-200 pt-5 pb-4 bg-white overflow-y-auto  w-64">
 
             <div className="flex items-center flex-shrink-0 px-4 ">
-                <Link to="/"><img className="w-auto" src={`${trim(logo, '/')}`} alt="Workflow" /></Link>
+                <Link to="/"><img className="w-auto" src={logo} alt="Workflow" /></Link>
             </div>
 
             <div className="mt-5 flex-grow flex flex-col">
