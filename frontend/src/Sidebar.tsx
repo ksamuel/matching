@@ -1,16 +1,25 @@
 import { useDispatch, useSelector } from "react-redux"
 
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import logo from "./logo.png"
 import MenuEntry from "./menuEntry"
 
-import { Link } from "react-router-dom"
-import { getAllDatasources } from "./api"
+import { Link, useHistory } from "react-router-dom"
+import { getAllDatasources, signOutUser } from "./api"
 import { setDatasources } from "./sampleSlice"
 
-
+import { ErrorNotification } from "./utils"
 
 export default function Sidebar() {
+
+    const history = useHistory()
+    const [errorMsg, setErrorMsg] = useState('')
+
+    // if the user is not connected, redirect to login
+
+    if (document.cookie.indexOf("sessionid") === -1) {
+        history.push('/login/')
+    }
 
     const dispatch = useDispatch()
     useEffect(() => {
@@ -21,6 +30,15 @@ export default function Sidebar() {
         ...
         state.samples
     }))
+
+    const logout = () => {
+        signOutUser().then((response) => {
+
+            history.push('/login/')
+        }).catch((error) => {
+            setErrorMsg('Une erreur inconnue est survenue')
+        })
+    }
 
     return (
         <div className="flex flex-col  border-r border-gray-200 pt-5 pb-4 bg-white overflow-y-auto  w-64">
@@ -39,6 +57,17 @@ export default function Sidebar() {
                 </nav>
 
             </div>
+
+            <div className="flex-shrink-0 f  p-4">
+                <button
+                    onClick={logout}
+
+                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                    Se déconnecter
+                </button>
+            </div>
+            {errorMsg && <ErrorNotification msg={errorMsg} />}
         </div>
     )
 }

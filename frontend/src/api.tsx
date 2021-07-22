@@ -1,4 +1,5 @@
 
+
 import { backend } from "./utils";
 
 export const getAllDatasources = () => {
@@ -14,7 +15,11 @@ export const getScoreBoundaries = (uid) => {
 }
 
 export const createSample = (uid, count, minScore, maxScore) => {
-    return backend.post(`api/v1/datasources/${uid}/samples/`, { count: count, min: minScore, max: maxScore })
+
+    return backend.get(`api/v1/datasources/${uid}/samples/?csrf=1`).then((response) => {
+        return backend.post(`api/v1/datasources/${uid}/samples/`, { count: count, min: minScore, max: maxScore }, { headers: { 'X-CSRFTOKEN': response.data['csrftoken'] } })
+    })
+
 }
 
 export const getSampleData = (sampleId) => {
@@ -22,7 +27,11 @@ export const getSampleData = (sampleId) => {
 }
 
 export const updatePairStatus = (sampleId, pairId, status) => {
-    return backend.put(`api/v1/samples/${sampleId}/pairs/${pairId}/status/`, { 'status': status })
+
+    return backend.get(`api/v1/samples/${sampleId}/pairs/${pairId}/status/?csrf=1`).then((response) => {
+        return backend.put(`api/v1/samples/${sampleId}/pairs/${pairId}/status/`, { 'status': status }, { headers: { 'X-CSRFTOKEN': response.data['csrftoken'] } })
+    })
+
 }
 
 export const getSampleParams = (sampleId) => {
@@ -35,4 +44,20 @@ export const uploadFile = (formData) => {
             'Content-Type': 'multipart/form-data'
         }
     })
+}
+
+export const signInUser = (email, password) => {
+    // Request the CSRF protection token before making the login request
+    return backend.get(`api/v1/login/?csrf=1`).then((response) => {
+        return backend.post(`api/v1/login/`, { username: email, password: password }, { headers: { 'X-CSRFTOKEN': response.data['csrftoken'] } })
+    })
+
+}
+
+export const signOutUser = () => {
+    // Request the CSRF protection token before making the logout request
+    return backend.get(`api/v1/logout/?csrf=1`).then((response) => {
+        return backend.post(`api/v1/logout/`, {}, { headers: { 'X-CSRFTOKEN': response.data['csrftoken'] } })
+    })
+
 }

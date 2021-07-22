@@ -6,7 +6,7 @@ import findCurrentData from "./selectors"
 
 import { setCurrentDataSource, setCurrentSample } from "./sampleSlice"
 
-import { classNames, ErrorNotification, Spinner, backend } from "./utils";
+import { classNames, ErrorNotification, Spinner } from "./utils";
 
 import { getDatasource, getSampleData, getSampleParams, updatePairStatus } from "./api";
 
@@ -35,7 +35,7 @@ function TripleButton({ value, onChange }) {
                     "focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500")}
             >
                 OK
-      </button>
+            </button>
             <button
                 onClick={onClick("nok")}
                 type="button"
@@ -45,7 +45,7 @@ function TripleButton({ value, onChange }) {
                     "focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500")}
             >
                 NOK
-	</button>
+            </button>
             <button
                 onClick={onClick("?")}
                 type="button"
@@ -55,7 +55,7 @@ function TripleButton({ value, onChange }) {
                     "focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500")}
             >
                 ?
-	</button>
+            </button>
         </span>
     )
 
@@ -247,8 +247,8 @@ export default function SampleTable() {
                                             >
                                                 <span className={"flex align-middle justify-center"}>Status
                                                     {order && <svg className={classNames(
-                                                    order === "descending" ? '-rotate-90' : 'rotate-90  ',
-                                                    '  h-4 w-4 transform   text-gray-800 transition-colors ease-in-out duration-150 mx-2')}
+                                                        order === "descending" ? '-rotate-90' : 'rotate-90  ',
+                                                        '  h-4 w-4 transform   text-gray-800 transition-colors ease-in-out duration-150 mx-2')}
                                                         viewBox="0 0 20 20"
                                                         aria-hidden="true"
 

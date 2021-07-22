@@ -125,7 +125,6 @@ export default function SamplingConfiguration() {
         setLoading("Echantillonnage en cours")
 
         createSample(currentDatasource.id, count, minScore, maxScore).then((response) => {
-            console.log(response.data)
             dispatch(addSampleToDataSource(response.data))
             history.push(`/datasources/${currentDatasource.id}/samples/${response.data.id}`)
         }
@@ -237,7 +236,7 @@ export default function SamplingConfiguration() {
                                         disabled={!count || maxScore === '' || minScore === ''}
                                         className="disabled:opacity-30  m-8 inline-flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-2xl">
                                         Lancer l'échantillonnage
-                                        </button>
+                                    </button>
 
                                 </div>
 

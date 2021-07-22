@@ -2,7 +2,6 @@ DOIT_CONFIG = {"verbosity": 2, "default_tasks": ["build"]}
 
 
 def task_build():
-
     """Build for production"""
     return {
         "actions": [
@@ -13,8 +12,7 @@ def task_build():
 
 
 def task_build_dev():
-
-    """Build for production"""
+    """Build for dev"""
     return {
         "actions": [
             "cd frontend && node node_modules/vite/bin/vite.js build --mode development --minify false --sourcemap true",

@@ -14,10 +14,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+from django.contrib.auth.decorators import login_required
 from django.conf import settings
-from django.conf.urls.static import static
+
 from django.urls import path, re_path
 from django.views.generic import TemplateView
+from django.contrib import admin
+from django.views.static import serve
 
 from backend.views import (
     upload_file,
@@ -28,6 +31,8 @@ from backend.views import (
     create_sample,
     get_sample_params,
     update_pair_status,
+    sign_in_user,
+    sign_out_user,
 )
 
 frontend_urls = [
@@ -36,39 +41,46 @@ frontend_urls = [
     "datasources/<datasourceId>/",
     "nodatasource/",
     "nosample/",
+    "login/",
 ]
 
-urlpatterns = (
-    [
-        # path("admin/", admin.site.urls),
-        re_path(
-            "api/v1/samples/(?P<sample_id>[0-9a-f-]{36})/pairs/(?P<pair_id>[0-9A-Z]+)/status/",
-            update_pair_status,
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    re_path(
+        "api/v1/samples/(?P<sample_id>[0-9a-f-]{36})/pairs/(?P<pair_id>[0-9A-Z]+)/status/",
+        update_pair_status,
+    ),
+    re_path("api/v1/samples/(?P<sample_id>[0-9a-f-]{36})/data/", get_sample_data),
+    re_path("api/v1/samples/(?P<sample_id>[0-9a-f-]{36})/params/", get_sample_params),
+    re_path(
+        "api/v1/datasources/(?P<datasource_id>[0-9a-f]{64})/scoreboundaries/",
+        score_boundaries,
+    ),
+    re_path(
+        "api/v1/datasources/(?P<datasource_id>[0-9a-f]{64})/samples/", create_sample
+    ),
+    re_path("api/v1/datasources/(?P<datasource_id>[0-9a-f]{64})/", datasource),
+    path("api/v1/datasources/", datasource_list),
+    path("api/v1/login/", sign_in_user),
+    path("api/v1/logout/", sign_out_user),
+    path("upload_file/", upload_file),
+    # This serves static files as if they would be in production by nginx or Apache
+    # You can use it to test your app with debug=True, but in production
+    # you should cover those url patterns using nginx or apache and not serve
+    # that with Django
+    re_path(
+        r"assets/(?P<path>.*)$",
+        serve,
+        {"document_root": settings.FRONTEND_DIR / "assets"},
+    ),
+] + [
+    path(
+        url,
+        TemplateView.as_view(
+            template_name="index.html",
+            extra_context={"URL_PREFIX": settings.URL_PREFIX},
         ),
-        re_path("api/v1/samples/(?P<sample_id>[0-9a-f-]{36})/data/", get_sample_data),
-        re_path(
-            "api/v1/samples/(?P<sample_id>[0-9a-f-]{36})/params/", get_sample_params
-        ),
-        re_path(
-            "api/v1/datasources/(?P<datasource_id>[0-9a-f]{64})/scoreboundaries/",
-            score_boundaries,
-        ),
-        re_path(
-            "api/v1/datasources/(?P<datasource_id>[0-9a-f]{64})/samples/", create_sample
-        ),
-        re_path("api/v1/datasources/(?P<datasource_id>[0-9a-f]{64})/", datasource),
-        path("api/v1/datasources/", datasource_list),
-        path("upload_file/", upload_file),
-    ]
-    + static("/assets/", document_root=settings.FRONTEND_DIR / "assets")
-    + [
-        path(
-            url,
-            TemplateView.as_view(
-                template_name="index.html",
-                extra_context={"URL_PREFIX": settings.URL_PREFIX},
-            ),
-        )
-        for url in frontend_urls
-    ]
-)
+    )
+    for url in frontend_urls
+]
+

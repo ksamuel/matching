@@ -19,8 +19,8 @@ def expiration_timestamp(days=30):
 def timestamp_to_iso(timestamp):
     return (
         dt.datetime.utcfromtimestamp(timestamp / 1000.0)
-            .replace(tzinfo=dt.timezone.utc)
-            .isoformat()
+        .replace(tzinfo=dt.timezone.utc)
+        .isoformat()
     )
 
 
@@ -64,8 +64,8 @@ class RedisClient:
             [
                 uid.decode("ascii")
                 for uid in self.connexion.zrangebyscore(
-                self.DATASOURCE_LIST_KEY, now_timestamp(), float("+inf")
-            )
+                    self.DATASOURCE_LIST_KEY, now_timestamp(), float("+inf")
+                )
             ]
         )
 
@@ -122,10 +122,10 @@ class RedisClient:
             [
                 uid.decode("ascii")
                 for uid in self.connexion.zrangebyscore(
-                self.DATASOURCE_SAMPLE_LIST_KEY.format(uid=datasource_id),
-                now_timestamp(),
-                float("+inf"),
-            )
+                    self.DATASOURCE_SAMPLE_LIST_KEY.format(uid=datasource_id),
+                    now_timestamp(),
+                    float("+inf"),
+                )
             ]
         )
 

@@ -12,12 +12,12 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 import os
 from pathlib import Path
 
-import django12factor
+from environs import Env
 
-from django.core.management.utils import get_random_secret_key
-
-from dotenv import load_dotenv
 import urllib
+
+env = Env()
+env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,37 +27,26 @@ FRONTEND_DIR = BASE_DIR / "frontend/dist/"
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
-load_dotenv()
 
-d12f = django12factor.factorise(
-    custom_settings=("INSERJEUNES_DB_PWD", "REDIS_URL", "CORS_ALLOWED_ORIGINS")
-)
+SECRET_KEY = env.str("SECRET_KEY")
 
-SECRET_KEY = d12f["SECRET_KEY"]
-
-URL_PREFIX = os.environ.get("URL_PREFIX", "/")
+URL_PREFIX = env.str("URL_PREFIX", default="/")
 
 FORCE_SCRIPT_NAME = URL_PREFIX
 
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = d12f["DEBUG"]
+DEBUG = env.bool("DEBUG", default=False)
 
-ALLOWED_HOSTS = d12f["ALLOWED_HOSTS"] + ["127.0.0.1", "localhost"]
+ALLOWED_HOSTS = list({"127.0.0.1", "localhost", *env.list("ALLOWED_HOSTS", default=[])})
 
-INSERJEUNES_DB_PWD = d12f["INSERJEUNES_DB_PWD"]
+INSERJEUNES_DB_PWD = env.str("INSERJEUNES_DB_PWD")
 
-CORS_ALLOWED_ORIGINS = d12f["CORS_ALLOWED_ORIGINS"]
-
-if CORS_ALLOWED_ORIGINS is None:
-    CORS_ALLOWED_ORIGINS = []
-else:
-    CORS_ALLOWED_ORIGINS = CORS_ALLOWED_ORIGINS.split(",")
+CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
 
 # Application definition
 
 INSTALLED_APPS = [
-    # "django.contrib.admin",
+    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -66,6 +55,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "rest_framework",
     "corsheaders",
+    "backend",
 ]
 
 MIDDLEWARE = [
@@ -81,37 +71,26 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "project.urls"
 
-TEMPLATES = [
-    {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-            ]
-        },
-    }
-]
 
 WSGI_APPLICATION = "project.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-
 DATABASES = {
-    "default": {"ENGINE": "django.db.backends.sqlite3", "NAME": BASE_DIR / "db.sqlite3"}
+    "auth": env.dj_db_url("AUTH_DB_URL"),
+    "default": {  # This is used only for session handling
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    },
 }
 
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": d12f["REDIS_URL"],
+        "LOCATION": env.str("REDIS_URL"),
     }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -131,7 +110,12 @@ TEMPLATES = [
         "DIRS": [FRONTEND_DIR],
         "APP_DIRS": True,
         "OPTIONS": {
-            # ... some options here ...
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ]
         },
     }
 ]
@@ -153,7 +137,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = "/assets/"
-STATIC_URL = "/media/"
 
 STATICFILES_DIRS = [FRONTEND_DIR / "assets"]
 
@@ -167,3 +150,25 @@ LOGGING = {
         "django": {"handlers": ["console"], "level": LOG_LEVEL, "propagate": False}
     },
 }
+
+
+AUTHENTICATION_BACKENDS = ["backend.auth.DeppAuthBackend"]
+LOGIN_REDIRECT_URL = "/"
+LOGIN_URL = "/login/"
+LOGOUT_REDIRECT_URL = "/"
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication"
+    ],
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
+}
+
+# This is True by default to protect against XSS but
+# it also makes accessing the cookie impossible using
+# JS. Since we are on an intranet, we use the cookie with
+# ajax instead of a token to make things simpler, and
+# since there is no user provided content, we can
+# set this to False. If conditions change, you'll have
+# to reasse this decision.
+SESSION_COOKIE_HTTPONLY = False

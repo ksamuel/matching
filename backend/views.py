@@ -3,14 +3,21 @@ import uuid
 from difflib import ndiff
 from operator import itemgetter
 
+from django.contrib.auth.decorators import login_required
 from django import forms
-from django.http import HttpResponse
+
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from django.contrib.auth import authenticate, login, logout
+from django.http import HttpResponse, HttpResponseBadRequest
+from django.middleware.csrf import get_token
+
 from lxml.etree import XMLSyntaxError
-from rest_framework.decorators import api_view, parser_classes
+from rest_framework.decorators import api_view, parser_classes, permission_classes
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
+
 from sqlalchemy.exc import (
     DisconnectionError,
     DBAPIError,
@@ -37,6 +44,7 @@ class UploadFileForm(forms.Form):
 
 @csrf_exempt
 @require_http_methods(["POST"])
+@login_required
 def upload_file(request):
     form = UploadFileForm(request.POST, request.FILES)
     if form.is_valid():
@@ -134,9 +142,13 @@ def score_boundaries(request, datasource_id):
         return Response(api.get_score_boundaries())
 
 
-@api_view(["POST"])
+@api_view(["GET", "POST"])
 @parser_classes([JSONParser])
 def create_sample(request, datasource_id):
+
+    if request.GET.get("csrf", ""):
+        return Response({"csrftoken": get_token(request)})
+
     try:
         with DBApi.db_from_cache(datasource_id) as api:
             count = int(request.data["count"])
@@ -156,8 +168,11 @@ def create_sample(request, datasource_id):
     return Response(redis.load_sample_params(sample_id))
 
 
-@api_view(["PUT"])
+@api_view(["GET", "PUT"])
 def update_pair_status(request, sample_id, pair_id):
+    if request.GET.get("csrf", ""):
+        return Response({"csrftoken": get_token(request)})
+
     datasource_id = redis.load_sample_params(sample_id)["datasource"]
     with DBApi.db_from_cache(datasource_id) as api:
         api.update_pair_status(pair_id, request.data["status"])
@@ -216,6 +231,32 @@ def get_sample_data(request, sample_id):
     return Response(sample_table)
 
 
-@api_view()
+@api_view(["GET"])
 def get_sample_params(request, sample_id):
     return Response(redis.load_sample_params(sample_id))
+
+
+@api_view(["GET", "POST"])
+@permission_classes([AllowAny])
+def sign_in_user(request):
+
+    if request.GET.get("csrf", ""):
+        return Response({"csrftoken": get_token(request)})
+
+    username = request.data.get("username", "").strip()
+    password = request.data.get("password", "").strip()
+    user = authenticate(username=username, password=password)
+    if not user:
+        return HttpResponseBadRequest()
+    login(request, user)
+    return Response({"user_id": user.id})
+
+
+@api_view(["GET", "POST"])
+def sign_out_user(request):
+
+    if request.GET.get("csrf", ""):
+        return Response({"csrftoken": get_token(request)})
+
+    logout(request)
+    return Response({"status": "logged_out"})

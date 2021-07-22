@@ -6,7 +6,7 @@ import { useHistory } from "react-router-dom";
 
 import { setDatasources, voidDataSource } from "./sampleSlice"
 import { getAllDatasources, uploadFile } from "./api";
-import { ErrorNotification, backend } from "./utils";
+import { ErrorNotification } from "./utils";
 
 export default function Dropzone() {
     const dispatch = useDispatch()

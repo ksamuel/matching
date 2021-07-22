@@ -63,11 +63,22 @@ export function trim(x, characters) {
 // so we must extrat the path again.
 export const URL_PREFIX = "/" + trim(new URL(document.querySelector('base').href).pathname, '/')
 
-export const backend = axios.create();
+export const backend = axios.create()
 
-export function ErrorNotification({ msg }) {
+// if the user is  not authenticated, redirect to the login page
+backend.interceptors.response.use(undefined, function (error) {
+
+    if (401 === error.response.status || 403 === error.response.status) {
+        window.location = '/login/'
+    } else {
+        return Promise.reject(error)
+    }
+})
+
+export function ErrorNotification({ msg, title }) {
     const [show, setShow] = useState(true)
 
+    title = title || "Il y a un problème"
     return (
         <>
             {/* Global notification live region, render this permanently at the end of the document */}
@@ -95,7 +106,7 @@ export function ErrorNotification({ msg }) {
                                         <XCircleIcon className="h-6 w-6 text-red-400" aria-hidden="true" />
                                     </div>
                                     <div className="ml-3 w-0 flex-1 pt-0.5">
-                                        <p className="text-lg font-medium text-gray-900">Il y a un problème</p>
+                                        <p className="text-lg font-medium text-gray-900">{title}</p>
                                         <p className="mt-1 text-lg text-gray-500">{msg}</p>
                                     </div>
                                     <div className="ml-4 flex-shrink-0 flex">
