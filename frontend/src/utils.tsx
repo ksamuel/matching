@@ -69,7 +69,7 @@ export const backend = axios.create()
 backend.interceptors.response.use(undefined, function (error) {
 
     if (401 === error.response.status || 403 === error.response.status) {
-        window.location = '/login/'
+        window.location = `${URL_PREFIX}/login/`
     } else {
         return Promise.reject(error)
     }
